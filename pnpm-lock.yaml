@@ -97,6 +97,9 @@ dependencies:
     version: 5.2.2
 
 devDependencies:
+  '@parcel/config-default':
+    specifier: ^2.9.3
+    version: 2.9.3(@parcel/core@2.9.3)
   '@parcel/transformer-sass':
     specifier: ^2.9.3
     version: 2.9.3(@parcel/core@2.9.3)
@@ -121,6 +124,9 @@ devDependencies:
   process:
     specifier: ^0.11.10
     version: 0.11.10
+  property-information:
+    specifier: ^6.2.0
+    version: 6.2.0
 
 packages:
 
@@ -1854,6 +1860,7 @@ packages:
     resolution: {integrity: sha512-GRaAEriuT4zp9N4p1i8BDBYmEyfo+xQ3yHjJU4eiK5NDa1RmUZG+unZABUTK4/Ox/M+GaHwb6Ow8rUITrtjszA==}
     dependencies:
       '@types/react': 18.2.21
+    dev: false
 
   /@types/react@18.2.21:
     resolution: {integrity: sha512-neFKG/sBAwGxHgXiIxnbm3/AAVQ/cMRS93hvBpg8xYRbeQSPVABp9U2bRnPf0iI4+Ucdv3plSxKK+3CW2ENJxA==}
@@ -4716,7 +4723,6 @@ packages:
 
   /property-information@6.2.0:
     resolution: {integrity: sha512-kma4U7AFCTwpqq5twzC1YVIDXSqg6qQK6JN0smOw8fgRy1OkMi0CYSzFmsy6dnqSenamAtj0CyXMUJ1Mf6oROg==}
-    dev: false
 
   /punycode@2.3.0:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}

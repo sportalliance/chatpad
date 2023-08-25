@@ -159,16 +159,16 @@ export function ChatRoute() {
           },
         ]);
         const chatDescription =
-          createChatDescription.data.choices[0].message?.content;
+          createChatDescription.choices[0].message?.content;
 
-        if (createChatDescription.data.usage) {
+        if (createChatDescription.usage) {
           await db.chats.where({ id: chatId }).modify((chat) => {
             chat.description = chatDescription ?? "New Chat";
             if (chat.totalTokens) {
               chat.totalTokens +=
-                createChatDescription.data.usage!.total_tokens;
+                createChatDescription.usage!.total_tokens;
             } else {
-              chat.totalTokens = createChatDescription.data.usage!.total_tokens;
+              chat.totalTokens = createChatDescription.usage!.total_tokens;
             }
           });
         }

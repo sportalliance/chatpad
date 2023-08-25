@@ -22,6 +22,8 @@ import "../styles/markdown.scss";
 import { CreatePromptModal } from "./CreatePromptModal";
 import { LogoIcon } from "./Logo";
 import { ScrollIntoView } from "./ScrollIntoView";
+import 'property-information';
+
 
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
