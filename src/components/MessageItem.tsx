@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
-import { IconCopy, IconUser } from "@tabler/icons-react";
+import {IconAdjustmentsCog, IconCopy, IconUser} from "@tabler/icons-react";
 import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -45,6 +45,7 @@ export function MessageItem({ message }: { message: Message }) {
             </ThemeIcon>
           )}
           {message.role === "assistant" && <LogoIcon style={{ height: 32 }} />}
+          {message.role === "system" && <IconAdjustmentsCog style={{ height: 32 }} />}
           <Box sx={{ flex: 1, width: 0 }} className="markdown">
             <ReactMarkdown
               children={message.content}

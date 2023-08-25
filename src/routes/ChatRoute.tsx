@@ -101,6 +101,14 @@ export function ChatRoute() {
 
     try {
       setSubmitting(true);
+      const systemMessage = getSystemMessage();
+      await db.messages.add({
+        id: nanoid(),
+        chatId,
+        content: systemMessage,
+        role: "system",
+        createdAt: new Date(),
+      });
 
       await db.messages.add({
         id: nanoid(),
@@ -125,7 +133,7 @@ export function ChatRoute() {
         [
           {
             role: "system",
-            content: getSystemMessage(),
+            content: systemMessage,
           },
           ...(messages ?? []).map((message) => ({
             role: message.role,
@@ -146,7 +154,7 @@ export function ChatRoute() {
         const createChatDescription = await createChatCompletion(apiKey, [
           {
             role: "system",
-            content: getSystemMessage(),
+            content: systemMessage,
           },
           ...(messages ?? []).map((message) => ({
             role: message.role,
