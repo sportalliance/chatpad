@@ -5,7 +5,7 @@ import {useLiveQuery} from "dexie-react-hooks";
 import {nanoid} from "nanoid";
 import {useMemo} from "react";
 import {db} from "../db";
-import {createChatCompletion} from "../utils/openai";
+import {createChatCompletion, createStreamChatCompletion} from "../utils/openai";
 import {DeletePromptModal} from "./DeletePromptModal";
 import {EditPromptModal} from "./EditPromptModal";
 
@@ -85,9 +85,9 @@ export function Prompts({
                                 size="lg"
                                 onClick={async () => {
                                     if (!apiKey) return;
-                                    const id = nanoid();
+                                    const chatId = nanoid();
                                     await db.chats.add({
-                                        id,
+                                        id: chatId,
                                         description: "New Chat",
                                         totalTokens: 0,
                                         createdAt: new Date(),
@@ -95,43 +95,34 @@ export function Prompts({
                                         totalCompletionTokens: 0,
                                         totalPromptTokens: 0
                                     });
+
                                     await db.messages.add({
                                         id: nanoid(),
-                                        chatId: id,
+                                        chatId: chatId,
                                         content: prompt.content,
                                         role: "user",
                                         createdAt: new Date(),
                                     });
-                                    navigate({to: `/chats/${id}`});
+                                    let messageId = nanoid();
+                                    await db.messages.add({
+                                        id: messageId,
+                                        chatId: chatId,
+                                        content: "█",
+                                        role: "assistant",
+                                        createdAt: new Date(),
+                                    });
+
+                                    navigate({to: `/chats/${chatId}`});
                                     onPlay();
 
-                                    const result = await createChatCompletion(apiKey, [
+                                    await createStreamChatCompletion(apiKey, [
                                         {
                                             role: "system",
                                             content:
                                                 "You are ChatGPT, a large language model trained by OpenAI.",
                                         },
                                         {role: "user", content: prompt.content},
-                                    ]);
-
-                                    const resultDescription =
-                                        result.choices[0].message?.content;
-                                    await db.messages.add({
-                                        id: nanoid(),
-                                        chatId: id,
-                                        content: resultDescription ?? "unknown reponse",
-                                        role: "assistant",
-                                        createdAt: new Date(),
-                                    });
-
-                                    if (result.usage) {
-                                        await db.chats.where({id: id}).modify((chat) => {
-                                            chat.totalTokens = (chat.totalTokens ?? 0) + result.usage!.total_tokens;
-                                            chat.totalPromptTokens = (chat.totalPromptTokens ?? 0) + result.usage!.prompt_tokens;
-                                            chat.totalCompletionTokens = (chat.totalCompletionTokens ?? 0) + result.usage!.completion_tokens;
-                                            chat.modelUsed = result.model;
-                                        });
-                                    }
+                                    ], chatId, messageId);
                                 }}
                             >
                                 <IconPlayerPlay size={20}/>
