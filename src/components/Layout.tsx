@@ -142,7 +142,7 @@ export function Layout() {
                         totalCompletionTokens: 0,
                         totalPromptTokens: 0,
                         createdAt: new Date(),
-                        modelUsed: db.settings.get("general")!.model,
+                        modelUsed: undefined,
                     });
                     navigate({ to: `/chats/${id}` });
                   }}

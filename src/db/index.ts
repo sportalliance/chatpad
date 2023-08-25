@@ -8,7 +8,7 @@ export interface Chat {
     totalTokens: number;
     totalPromptTokens: number;
     totalCompletionTokens: number;
-    modelUsed: string,
+    modelUsed?: string,
     createdAt: Date;
 }
 
