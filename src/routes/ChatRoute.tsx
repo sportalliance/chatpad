@@ -164,12 +164,10 @@ export function ChatRoute() {
         if (createChatDescription.usage) {
           await db.chats.where({ id: chatId }).modify((chat) => {
             chat.description = chatDescription ?? "New Chat";
-            if (chat.totalTokens) {
-              chat.totalTokens +=
-                createChatDescription.usage!.total_tokens;
-            } else {
-              chat.totalTokens = createChatDescription.usage!.total_tokens;
-            }
+            chat.totalTokens = (chat.totalTokens ?? 0) + createChatDescription.usage!.total_tokens;
+            chat.totalPromptTokens = (chat.totalPromptTokens ?? 0) + createChatDescription.usage!.prompt_tokens;
+            chat.totalCompletionTokens = (chat.totalCompletionTokens ?? 0) + createChatDescription.usage!.completion_tokens;
+            chat.modelUsed = createChatDescription.model;
           });
         }
       }

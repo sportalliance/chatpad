@@ -123,11 +123,10 @@ export function Prompts({
 
                   if (result.usage) {
                     await db.chats.where({ id: id }).modify((chat) => {
-                      if (chat.totalTokens) {
-                        chat.totalTokens += result.usage!.total_tokens;
-                      } else {
-                        chat.totalTokens = result.usage!.total_tokens;
-                      }
+                      chat.totalTokens = (chat.totalTokens ?? 0) + result.usage!.total_tokens;
+                      chat.totalPromptTokens = (chat.totalPromptTokens ?? 0) + result.usage!.prompt_tokens;
+                      chat.totalCompletionTokens = (chat.totalCompletionTokens ?? 0) + result.usage!.completion_tokens;
+                      chat.modelUsed = result.model;
                     });
                   }
                 }}

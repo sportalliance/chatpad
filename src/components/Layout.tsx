@@ -137,9 +137,12 @@ export function Layout() {
                     const id = nanoid();
                     db.chats.add({
                       id,
-                      description: "New Chat",
-                      totalTokens: 0,
-                      createdAt: new Date(),
+                        description: "New Chat",
+                        totalTokens: 0,
+                        totalCompletionTokens: 0,
+                        totalPromptTokens: 0,
+                        createdAt: new Date(),
+                        modelUsed: db.settings.get("general")!.model,
                     });
                     navigate({ to: `/chats/${id}` });
                   }}
@@ -282,7 +285,7 @@ export function Layout() {
                 height: "100%",
               }}
             >
-              {`${chat.description} - ${chat.totalTokens ?? 0} tokens ~ $${(
+              {`${chat.description} - ${chat.totalTokens ?? 0} tokens [${chat.modelUsed ?? 'GPT-3.5'}] ~ $${(
                 ((chat.totalTokens ?? 0) * 0.002) /
                 1000
               ).toFixed(5)}`}
