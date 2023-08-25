@@ -102,13 +102,16 @@ export function ChatRoute() {
     try {
       setSubmitting(true);
       const systemMessage = getSystemMessage();
-      await db.messages.add({
-        id: nanoid(),
-        chatId,
-        content: systemMessage,
-        role: "system",
-        createdAt: new Date(),
-      });
+      //Only log the system message if it's a new chat
+      if (chat?.description === "New Chat") {
+        await db.messages.add({
+          id: nanoid(),
+          chatId,
+          content: systemMessage,
+          role: "system",
+          createdAt: new Date(),
+        });
+      }
 
       await db.messages.add({
         id: nanoid(),
