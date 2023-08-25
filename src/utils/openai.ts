@@ -4,6 +4,7 @@ import {OpenAIExt} from "openai-ext";
 import {db} from "../db";
 import {config} from "./config";
 import {ChatCompletionMessage} from "openai/resources/chat";
+import {GPTTokens} from "gpt-tokens/index";
 
 function getClient(
     apiKey: string,
@@ -68,10 +69,23 @@ function setStreamContent(
     db.messages.update(messageId, {content: content});
 }
 
-function setTotalTokens(chatId: string, content: string) {
-    let total_tokens = encode(content).length;
+async function setTotalTokens(chatId: string, content: string) {
+    const messages = (await db.messages.where({chatId: chatId}).toArray()).map((message) => {
+        return {
+            role: message.role,
+            content: message.content,
+        };
+    });
+    const chat = await db.chats.get(chatId);
+    const gptTokens = new GPTTokens({
+        model: chat?.modelUsed ?? (await db.settings.get("general"))?.model ?? config.defaultModel,
+        messages: messages,
+    });
     db.chats.where({id: chatId}).modify((chat) => {
-        chat.totalTokens = (chat.totalTokens ?? 0) + total_tokens;
+        chat.totalTokens = gptTokens.usedTokens;
+        chat.totalPromptTokens = gptTokens.promptUsedTokens;
+        chat.totalCompletionTokens = gptTokens.completionUsedTokens;
+        chat.totalPriceUsd = gptTokens.usedUSD;
     });
 }
 

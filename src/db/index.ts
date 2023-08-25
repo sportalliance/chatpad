@@ -10,6 +10,7 @@ export interface Chat {
     totalCompletionTokens: number;
     modelUsed?: string,
     createdAt: Date;
+    totalPriceUsd?:number;
 }
 
 export interface Message {

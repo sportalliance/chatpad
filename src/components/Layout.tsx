@@ -67,6 +67,12 @@ export function Layout() {
         theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[2]
     }`;
 
+    function getPrice() {
+        if(chat?.totalPriceUsd) return chat?.totalPriceUsd;
+
+        return ((chat?.totalTokens ?? 0) * 0.002) / 1000;
+    }
+
     useEffect(() => {
         setOpened(false);
     }, [router.state.location]);
@@ -285,10 +291,7 @@ export function Layout() {
                                 height: "100%",
                             }}
                         >
-                            {`${chat.description} - ${chat.totalTokens ?? 0} tokens ${(chat.modelUsed ? `[${chat.modelUsed}]` : '')} ~ $${(
-                                ((chat.totalTokens ?? 0) * 0.002) /
-                                1000
-                            ).toFixed(5)}`}
+                            {`${chat.description} - ${chat.totalTokens ?? 0} tokens ${(chat.modelUsed ? `[${chat.modelUsed}]` : '')} ~ $${getPrice().toFixed(5)}`}
                         </div>
                     </Header>
                 ) : undefined
