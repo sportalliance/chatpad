@@ -421,7 +421,7 @@ export function ChatRoute() {
                             onKeyDown={async (event) => {
                                 if (event.code === "Enter" && !event.shiftKey) {
                                     event.preventDefault();
-                                    submit();
+                                    await submit();
                                     setUserMsgIndex(0);
                                 }
                                 if (event.code === "ArrowUp") {
@@ -435,8 +435,8 @@ export function ChatRoute() {
                         <MediaQuery largerThan="sm" styles={{display: "none"}}>
                             <Button
                                 h="auto"
-                                onClick={() => {
-                                    submit();
+                                onClick={async () => {
+                                    await submit();
                                 }}
                             >
                                 <AiOutlineSend/>
