@@ -4,7 +4,7 @@ import {OpenAIExt} from "openai-ext";
 import {db} from "../db";
 import {config} from "./config";
 import {ChatCompletionMessage} from "openai/resources/chat";
-import {GPTTokens} from "gpt-tokens/index";
+import {GPTTokens, supportModelType} from "gpt-tokens/index";
 
 function getClient(
     apiKey: string,
@@ -35,6 +35,11 @@ export async function createStreamChatCompletion(
     const model = chat?.modelUsed ?? settings?.openAiModel ?? config.defaultModel;
     const chatCompletionsUrl = settings?.openAiApiBase ? settings?.openAiApiBase + "/chat/completions" : undefined;
 
+    if(model != chat?.modelUsed) {
+        await db.chats.where({id: chatId}).modify((chat) => {
+            chat.modelUsed = model;
+        });
+    }
 
     return OpenAIExt.streamClientChatCompletion(
         {
@@ -82,7 +87,7 @@ async function setTotalTokens(chatId: string, content: string) {
     });
     const chat = await db.chats.get(chatId);
     const gptTokens = new GPTTokens({
-        model: chat?.modelUsed ?? (await db.settings.get("general"))?.model ?? config.defaultModel,
+        model: chat?.modelUsed! as any as supportModelType,
         messages: messages,
     });
     db.chats.where({id: chatId}).modify((chat) => {
