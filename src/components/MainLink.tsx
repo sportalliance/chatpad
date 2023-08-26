@@ -12,7 +12,7 @@ interface MainLinkProps {
 export function MainLink({ icon, color, label, chat }: MainLinkProps) {
   const firstMessage = useLiveQuery(async () => {
     return (await db.messages.orderBy("createdAt").toArray()).filter(
-      (m) => m.chatId === chat.id
+      (m) => m.chatId === chat.id && m.role === "user"
     )[0];
   }, [chat]);
 
