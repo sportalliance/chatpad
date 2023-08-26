@@ -11,12 +11,12 @@ import {
     Skeleton,
     Stack,
     SegmentedControl,
-    Textarea,
+    Textarea, Tooltip, ActionIcon,
 } from "@mantine/core";
 import {notifications} from "@mantine/notifications";
 import {useLiveQuery} from "dexie-react-hooks";
 import {nanoid} from "nanoid";
-import {KeyboardEvent, useState, type ChangeEvent, useEffect, useRef} from "react";
+import React, {KeyboardEvent, useState, type ChangeEvent, useEffect, useRef} from "react";
 import {AiOutlineSend} from "react-icons/ai";
 import {MessageItem} from "../components/MessageItem";
 import {db, Message} from "../db";
@@ -29,6 +29,7 @@ import {
 import {Placeholder} from "../components/Placeholder";
 import LazyLoad from "react-lazyload";
 import {ChatCompletionMessage} from "openai/resources/chat";
+import {IconClockStop} from "@tabler/icons-react";
 
 export function ChatRoute() {
     const chatId = useChatId();
@@ -40,7 +41,7 @@ export function ChatRoute() {
         return db.messages.where("chatId").equals(chatId).sortBy("createdAt");
     }, [chatId]);
 
-    const lastMessages = new Map(messages?.slice(-10)?.map((message) => [message.id, true]));
+    const lastMessages = new Map(messages?.slice(-8)?.map((message) => [message.id, true]));
     const userMessages =
         messages
             ?.filter((message) => message.role === "user")
@@ -49,6 +50,7 @@ export function ChatRoute() {
     const [content, setContent] = useState("");
     const [contentDraft, setContentDraft] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [generatingRequest, setGeneratingRequest] = useState<XMLHttpRequest | undefined>(undefined);
 
     const chat = useLiveQuery(async () => {
         if (!chatId) return null;
@@ -98,7 +100,15 @@ export function ChatRoute() {
         }, 1000);
     }, []);
 
-
+    const abortGeneration = () => {
+        generatingRequest?.abort();
+        setSubmitting(false);
+        notifications.show({
+            title: "Stopped",
+            color: "yellow",
+            message: "Stopped generating message.",
+        });
+    }
     const submit = async () => {
         if (submitting) return;
 
@@ -163,40 +173,45 @@ export function ChatRoute() {
             if (chat?.isNewChat || chat?.isNewChat === undefined) {
                 messagesToSend.push({role: "system", content: systemMessage})
             }
-            await createStreamChatCompletion(
+            const request = await createStreamChatCompletion(
                 apiKey,
                 messagesToSend,
                 chatId,
                 messageId,
                 async () => {
-                    if (!(chat?.isNewChat || chat?.isNewChat === undefined)) {
-                        return;
-                    }
-                    const messages = await db.messages
-                        .where({chatId})
-                        .sortBy("createdAt");
-                    const createChatDescription = await createChatCompletion(apiKey, [
-                        ...(messages ?? []).map((message) => ({
-                            role: message.role,
-                            content: message.content,
-                        })),
-                        {
-                            role: "user",
-                            content:
-                                "What would be a short and relevant title for this chat ? You must strictly answer with only the title, no other text is allowed.",
-                        },
-                    ]);
-                    const chatDescription =
-                        createChatDescription.choices[0].message?.content;
+                    try {
+                        if (!(chat?.isNewChat || chat?.isNewChat === undefined)) {
+                            return;
+                        }
+                        const messages = await db.messages
+                            .where({chatId})
+                            .sortBy("createdAt");
+                        const createChatDescription = await createChatCompletion(apiKey, [
+                            ...(messages ?? []).map((message) => ({
+                                role: message.role,
+                                content: message.content,
+                            })),
+                            {
+                                role: "user",
+                                content:
+                                    "What would be a short and relevant title for this chat ? You must strictly answer with only the title, no other text is allowed.",
+                            },
+                        ]);
+                        const chatDescription =
+                            createChatDescription.choices[0].message?.content;
 
-                    if (createChatDescription.usage) {
-                        await db.chats.where({id: chatId}).modify((chat) => {
-                            chat.description = chatDescription ?? "New Chat";
-                            chat.modelUsed = createChatDescription.model;
-                        });
+                        if (createChatDescription.usage) {
+                            await db.chats.where({id: chatId}).modify((chat) => {
+                                chat.description = chatDescription ?? "New Chat";
+                                chat.modelUsed = createChatDescription.model;
+                            });
+                        }
+                    } finally {
+                        setSubmitting(false);
                     }
                 }
             );
+            setGeneratingRequest(request);
 
 
         } catch (error: any) {
@@ -219,7 +234,6 @@ export function ChatRoute() {
             if (chat?.isNewChat || chat?.isNewChat === undefined) {
                 await db.chats.where({id: chatId}).modify({isNewChat: false});
             }
-            setSubmitting(false);
         }
     };
 
@@ -277,15 +291,6 @@ export function ChatRoute() {
                     ))}
                     <div ref={messagesEndRef}/>
                 </Stack>
-                {submitting && (
-                    <Card withBorder mt="xs">
-                        <Skeleton height={8} radius="xl"/>
-                        <Skeleton height={8} mt={6} radius="xl"/>
-                        <Skeleton height={8} mt={6} radius="xl"/>
-                        <Skeleton height={8} mt={6} radius="xl"/>
-                        <Skeleton height={8} mt={6} width="70%" radius="xl"/>
-                    </Card>
-                )}
             </Container>
             <Box
                 py="lg"
@@ -437,6 +442,11 @@ export function ChatRoute() {
                                 <AiOutlineSend/>
                             </Button>
                         </MediaQuery>
+                        {submitting && (<Tooltip label={"Stop generating"} position="right">
+                            <ActionIcon h={"auto"} onClick={() => abortGeneration()}>
+                                <IconClockStop opacity={0.5} size={20}></IconClockStop>
+                            </ActionIcon>
+                        </Tooltip>)}
                     </Flex>
                 </Container>
             </Box>
