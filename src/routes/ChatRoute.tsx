@@ -72,7 +72,7 @@ export function ChatRoute() {
             message.push(
                 "You are ChatGPT, a large language model trained by OpenAI."
             );
-        return message.join(" ");
+        return message.join(" ") + " Always answer in markdown (no code block around it).";
     };
 
     const settings = useLiveQuery(async () => {

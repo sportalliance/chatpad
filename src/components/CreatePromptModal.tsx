@@ -20,7 +20,7 @@ export function CreatePromptModal({content, chatId}: { content?: string, chatId?
 
     const [value, setValue] = useState("");
     const [title, setTitle] = useState("");
-    const [systemValue, setSystemValue] = useState("You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users.");
+    const [systemValue, setSystemValue] = useState("You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users. Always answer in markdown (no code block around it).");
 
     const getSystemPrompt = useCallback(async () => {
         if (!chatId) return;
