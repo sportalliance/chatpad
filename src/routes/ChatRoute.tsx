@@ -88,6 +88,7 @@ export function ChatRoute() {
     const messagesEndRef = useRef(null)
 
     const scrollToBottom = () => {
+        // @ts-ignore
         messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
     }
 
