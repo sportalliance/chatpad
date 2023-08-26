@@ -1,35 +1,33 @@
 import {
+    ActionIcon,
     Box,
     Button,
-    Card,
     Container,
     Flex,
     Group,
     MediaQuery,
+    SegmentedControl,
     Select,
     SimpleGrid,
-    Skeleton,
     Stack,
-    SegmentedControl,
-    Textarea, Tooltip, ActionIcon,
+    Textarea,
+    Tooltip,
 } from "@mantine/core";
 import {notifications} from "@mantine/notifications";
 import {useLiveQuery} from "dexie-react-hooks";
 import {nanoid} from "nanoid";
-import React, {KeyboardEvent, useState, type ChangeEvent, useEffect, useRef} from "react";
+import React, {type ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from "react";
 import {AiOutlineSend} from "react-icons/ai";
 import {MessageItem} from "../components/MessageItem";
 import {db, Message} from "../db";
 import {useChatId} from "../hooks/useChatId";
 import {config} from "../utils/config";
-import {
-    createChatCompletion,
-    createStreamChatCompletion,
-} from "../utils/openai";
+import {createStreamChatCompletion,} from "../utils/openai";
 import {Placeholder} from "../components/Placeholder";
 import LazyLoad from "react-lazyload";
 import {ChatCompletionMessage} from "openai/resources/chat";
 import {IconClockStop} from "@tabler/icons-react";
+import {updateChatTitle} from "../utils/chatUpdateTitle";
 
 export function ChatRoute() {
     const chatId = useChatId();
@@ -181,32 +179,7 @@ export function ChatRoute() {
                 messageId,
                 async () => {
                     try {
-                        if (!(chat?.isNewChat || chat?.isNewChat === undefined)) {
-                            return;
-                        }
-                        const messages = await db.messages
-                            .where({chatId})
-                            .sortBy("createdAt");
-                        const createChatDescription = await createChatCompletion(apiKey, [
-                            ...(messages ?? []).map((message) => ({
-                                role: message.role,
-                                content: message.content,
-                            })),
-                            {
-                                role: "user",
-                                content:
-                                    "What would be a short and relevant title for this chat ? You must strictly answer with only the title, no other text is allowed.",
-                            },
-                        ]);
-                        const chatDescription =
-                            createChatDescription.choices[0].message?.content;
-
-                        if (createChatDescription.usage) {
-                            await db.chats.where({id: chatId}).modify((chat) => {
-                                chat.description = chatDescription ?? "New Chat";
-                                chat.modelUsed = createChatDescription.model;
-                            });
-                        }
+                        await updateChatTitle(chat!, apiKey);
                     } finally {
                         setSubmitting(false);
                     }

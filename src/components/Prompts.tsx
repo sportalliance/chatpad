@@ -4,10 +4,11 @@ import {useNavigate} from "@tanstack/react-location";
 import {useLiveQuery} from "dexie-react-hooks";
 import {nanoid} from "nanoid";
 import {useMemo} from "react";
-import {db} from "../db";
+import {Chat, db} from "../db";
 import {createChatCompletion, createStreamChatCompletion} from "../utils/openai";
 import {DeletePromptModal} from "./DeletePromptModal";
 import {EditPromptModal} from "./EditPromptModal";
+import {updateChatTitle} from "../utils/chatUpdateTitle";
 
 export function Prompts({
                             onPlay,
@@ -87,15 +88,17 @@ export function Prompts({
                                     if (!apiKey) return;
                                     const chatId = nanoid();
                                     prompt.system ??= "You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users. Always answer in markdown (no code block around it).";
-                                    await db.chats.add({
+                                    const chat : Chat = {
                                         id: chatId,
                                         description: "New Chat",
                                         totalTokens: 0,
                                         createdAt: new Date(),
                                         modelUsed: undefined,
                                         totalCompletionTokens: 0,
-                                        totalPromptTokens: 0
-                                    });
+                                        totalPromptTokens: 0,
+                                        isNewChat: true,
+                                    };
+                                    await db.chats.add(chat);
                                     await db.messages.add({
                                         id: nanoid(),
                                         chatId: chatId,
@@ -124,12 +127,14 @@ export function Prompts({
                                     onPlay();
 
                                     await createStreamChatCompletion(apiKey, [
-                                        {
-                                            role: "system",
-                                            content: prompt.system,
-                                        },
-                                        {role: "user", content: prompt.content},
-                                    ], chatId, messageId);
+                                            {
+                                                role: "system",
+                                                content: prompt.system,
+                                            },
+                                            {role: "user", content: prompt.content},
+                                        ], chatId,
+                                        messageId,
+                                        async () => await updateChatTitle(chat, apiKey));
                                 }}
                             >
                                 <IconPlayerPlay size={20}/>

@@ -91,7 +91,7 @@ export function MessageItem({message}: { message: Message }) {
                             )}
                         </Box>
                         <Box>
-                            <CreatePromptModal content={message.content} chatId={message.chatId}/>
+                            {message.role != "system" && (<CreatePromptModal content={message.content} chatId={message.chatId}/>)}
                             <CopyButton value={message.content}>
                                 {({copied, copy}) => (
                                     <Tooltip label={copied ? "Copied" : "Copy"} position="left">
