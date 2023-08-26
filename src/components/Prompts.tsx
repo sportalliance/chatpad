@@ -86,7 +86,7 @@ export function Prompts({
                                 onClick={async () => {
                                     if (!apiKey) return;
                                     const chatId = nanoid();
-                                    prompt.system ??= "You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users.";
+                                    prompt.system ??= "You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users. Always answer in markdown (no code block around it).";
                                     await db.chats.add({
                                         id: chatId,
                                         description: "New Chat",

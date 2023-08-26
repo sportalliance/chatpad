@@ -48,9 +48,9 @@ export class Database extends Dexie {
 
     constructor() {
         super("chatpad");
-        this.version(2).stores({
+        this.version(5).stores({
             chats: "id, createdAt",
-            messages: "id, chatId, createdAt",
+            messages: "id, chatId, createdAt, [chatId+role]",
             prompts: "id, createdAt",
             settings: "id",
         });
