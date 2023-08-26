@@ -27,7 +27,8 @@ export async function createStreamChatCompletion(
     apiKey: string,
     messages: ChatCompletionMessage[],
     chatId: string,
-    messageId: string
+    messageId: string,
+    onDone?: () => Promise<void>
 ) {
     const chat = await db.chats.get(chatId);
     const settings = await db.settings.get("general");
@@ -50,7 +51,10 @@ export async function createStreamChatCompletion(
                         setTotalTokens(chatId, content);
                     }
                 },
-                onDone(stream) {
+                async onDone(stream) {
+                    if(onDone) {
+                        await onDone();
+                    }
                 },
                 onError(error, stream) {
                     console.error(error);

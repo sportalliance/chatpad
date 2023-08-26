@@ -11,6 +11,7 @@ export interface Chat {
     modelUsed?: string,
     createdAt: Date;
     totalPriceUsd?:number;
+    isNewChat?: Boolean;
 }
 
 export interface Message {

@@ -28,6 +28,7 @@ import {
 } from "../utils/openai";
 import {Placeholder} from "../components/Placeholder";
 import LazyLoad from "react-lazyload";
+import {ChatCompletionMessage} from "openai/resources/chat";
 
 export function ChatRoute() {
     const chatId = useChatId();
@@ -123,7 +124,7 @@ export function ChatRoute() {
             setSubmitting(true);
             const systemMessage = getSystemMessage();
             //Only log the system message if it's a new chat
-            if (chat?.description === "New Chat") {
+            if (chat?.isNewChat || chat?.isNewChat === undefined) {
                 await db.messages.add({
                     id: nanoid(),
                     chatId,
@@ -151,49 +152,52 @@ export function ChatRoute() {
                 createdAt: new Date(),
             });
 
+            let messagesToSend: ChatCompletionMessage[] = [
+                ...(messages ?? []).map((message) => ({
+                    role: message.role,
+                    content: message.content,
+                })),
+                {role: "user", content},
+            ];
+
+            if (chat?.isNewChat || chat?.isNewChat === undefined) {
+                messagesToSend.push({role: "system", content: systemMessage})
+            }
             await createStreamChatCompletion(
                 apiKey,
-                [
-                    ...(messages ?? []).map((message) => ({
-                        role: message.role,
-                        content: message.content,
-                    })),
-                    {role: "user", content},
-                ],
+                messagesToSend,
                 chatId,
-                messageId
+                messageId,
+                async () => {
+                    if (!(chat?.isNewChat || chat?.isNewChat === undefined)) {
+                        return;
+                    }
+                    const messages = await db.messages
+                        .where({chatId})
+                        .sortBy("createdAt");
+                    const createChatDescription = await createChatCompletion(apiKey, [
+                        ...(messages ?? []).map((message) => ({
+                            role: message.role,
+                            content: message.content,
+                        })),
+                        {
+                            role: "user",
+                            content:
+                                "What would be a short and relevant title for this chat ? You must strictly answer with only the title, no other text is allowed.",
+                        },
+                    ]);
+                    const chatDescription =
+                        createChatDescription.choices[0].message?.content;
+
+                    if (createChatDescription.usage) {
+                        await db.chats.where({id: chatId}).modify((chat) => {
+                            chat.description = chatDescription ?? "New Chat";
+                        });
+                    }
+                }
             );
 
-            setSubmitting(false);
 
-            if (chat?.description === "New Chat") {
-                const messages = await db.messages
-                    .where({chatId})
-                    .sortBy("createdAt");
-                const createChatDescription = await createChatCompletion(apiKey, [
-                    ...(messages ?? []).map((message) => ({
-                        role: message.role,
-                        content: message.content,
-                    })),
-                    {
-                        role: "user",
-                        content:
-                            "What would be a short and relevant title for this chat ? You must strictly answer with only the title, no other text is allowed.",
-                    },
-                ]);
-                const chatDescription =
-                    createChatDescription.choices[0].message?.content;
-
-                if (createChatDescription.usage) {
-                    await db.chats.where({id: chatId}).modify((chat) => {
-                        chat.description = chatDescription ?? "New Chat";
-                        chat.totalTokens = (chat.totalTokens ?? 0) + createChatDescription.usage!.total_tokens;
-                        chat.totalPromptTokens = (chat.totalPromptTokens ?? 0) + createChatDescription.usage!.prompt_tokens;
-                        chat.totalCompletionTokens = (chat.totalCompletionTokens ?? 0) + createChatDescription.usage!.completion_tokens;
-                        chat.modelUsed = createChatDescription.model;
-                    });
-                }
-            }
         } catch (error: any) {
             if (error.toJSON().message === "Network Error") {
                 notifications.show({
@@ -211,6 +215,9 @@ export function ChatRoute() {
                 });
             }
         } finally {
+            if (chat?.isNewChat || chat?.isNewChat === undefined) {
+                await db.chats.where({id: chatId}).modify({isNewChat: false});
+            }
             setSubmitting(false);
         }
     };
@@ -250,11 +257,11 @@ export function ChatRoute() {
     if (!chatId) return null;
 
     function messageRender(message: Message) {
-        if(lastMessages?.has(message.id)) {
+        if (lastMessages?.has(message.id)) {
             return (<MessageItem key={message.id} message={message}/>)
         }
         return (
-            <LazyLoad key={message.id} height={200} offset={100} unmountIfInvisible={true} placeholder={<Placeholder />}>
+            <LazyLoad key={message.id} height={200} offset={100} unmountIfInvisible={true} placeholder={<Placeholder/>}>
                 <MessageItem message={message}/>
             </LazyLoad>
         )
@@ -265,7 +272,7 @@ export function ChatRoute() {
             <Container pt="xl" pb={100}>
                 <Stack spacing="xs">
                     {messages?.map((message) => (
-                       messageRender(message)
+                        messageRender(message)
                     ))}
                     <div ref={messagesEndRef}/>
                 </Stack>

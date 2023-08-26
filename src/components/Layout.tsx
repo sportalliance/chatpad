@@ -149,6 +149,7 @@ export function Layout() {
                                             totalPromptTokens: 0,
                                             createdAt: new Date(),
                                             modelUsed: undefined,
+                                            isNewChat: true,
                                         });
                                         navigate({to: `/chats/${id}`});
                                     }}
