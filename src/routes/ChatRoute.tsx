@@ -171,10 +171,6 @@ export function ChatRoute() {
                     .where({chatId})
                     .sortBy("createdAt");
                 const createChatDescription = await createChatCompletion(apiKey, [
-                    {
-                        role: "system",
-                        content: systemMessage,
-                    },
                     ...(messages ?? []).map((message) => ({
                         role: message.role,
                         content: message.content,
