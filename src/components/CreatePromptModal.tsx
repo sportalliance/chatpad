@@ -20,6 +20,8 @@ export function CreatePromptModal({ content }: { content?: string }) {
 
   const [value, setValue] = useState("");
   const [title, setTitle] = useState("");
+  const [systemValue, setSystemValue] = useState("You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users.");
+
   useEffect(() => {
     setValue(content ?? "");
   }, [content]);
@@ -49,6 +51,7 @@ export function CreatePromptModal({ content }: { content?: string }) {
                 title,
                 content: value,
                 createdAt: new Date(),
+                system: systemValue,
               });
               notifications.show({
                 title: "Saved",
@@ -85,7 +88,15 @@ export function CreatePromptModal({ content }: { content?: string }) {
               data-autofocus
             />
             <Textarea
-              placeholder="Content"
+                label="System"
+                autosize
+                minRows={5}
+                maxRows={10}
+                value={systemValue}
+                onChange={(event) => setSystemValue(event.currentTarget.value)}
+            />
+            <Textarea
+              label="Content"
               autosize
               minRows={5}
               maxRows={10}

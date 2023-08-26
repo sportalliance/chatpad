@@ -150,10 +150,6 @@ export function ChatRoute() {
       await createStreamChatCompletion(
         apiKey,
         [
-          {
-            role: "system",
-            content: systemMessage,
-          },
           ...(messages ?? []).map((message) => ({
             role: message.role,
             content: message.content,

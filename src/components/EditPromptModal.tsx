@@ -19,9 +19,12 @@ export function EditPromptModal({ prompt }: { prompt: Prompt }) {
 
   const [value, setValue] = useState("");
   const [title, setTitle] = useState("");
+  const [systemValue, setSystemValue] = useState("");
+
   useEffect(() => {
     setValue(prompt?.content ?? "");
     setTitle(prompt?.title ?? "");
+    setSystemValue(prompt?.system ?? "You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users.");
   }, [prompt]);
 
   return (
@@ -32,9 +35,10 @@ export function EditPromptModal({ prompt }: { prompt: Prompt }) {
             try {
               setSubmitting(true);
               event.preventDefault();
-              await db.prompts.where({ id: prompt.id }).modify((chat) => {
-                chat.title = title;
-                chat.content = value;
+              await db.prompts.where({ id: prompt.id }).modify((prompt) => {
+                prompt.title = title;
+                prompt.content = value;
+                prompt.system = systemValue;
               });
               notifications.show({
                 title: "Saved",
@@ -68,6 +72,14 @@ export function EditPromptModal({ prompt }: { prompt: Prompt }) {
               onChange={(event) => setTitle(event.currentTarget.value)}
               formNoValidate
               data-autofocus
+            />
+            <Textarea
+                label="System"
+                autosize
+                minRows={5}
+                maxRows={10}
+                value={systemValue}
+                onChange={(event) => setSystemValue(event.currentTarget.value)}
             />
             <Textarea
               label="Content"

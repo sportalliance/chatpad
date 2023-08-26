@@ -86,6 +86,7 @@ export function Prompts({
                                 onClick={async () => {
                                     if (!apiKey) return;
                                     const chatId = nanoid();
+                                    prompt.system ??= "You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users.";
                                     await db.chats.add({
                                         id: chatId,
                                         description: "New Chat",
@@ -94,6 +95,13 @@ export function Prompts({
                                         modelUsed: undefined,
                                         totalCompletionTokens: 0,
                                         totalPromptTokens: 0
+                                    });
+                                    await db.messages.add({
+                                        id: nanoid(),
+                                        chatId: chatId,
+                                        content: prompt.system,
+                                        role: "system",
+                                        createdAt: new Date(),
                                     });
 
                                     await db.messages.add({
@@ -118,8 +126,7 @@ export function Prompts({
                                     await createStreamChatCompletion(apiKey, [
                                         {
                                             role: "system",
-                                            content:
-                                                "You are ChatGPT, a large language model trained by OpenAI.",
+                                            content: prompt.system,
                                         },
                                         {role: "user", content: prompt.content},
                                     ], chatId, messageId);
