@@ -16,7 +16,7 @@ import {
 import { notifications } from "@mantine/notifications";
 import { useLiveQuery } from "dexie-react-hooks";
 import { nanoid } from "nanoid";
-import { KeyboardEvent, useState, type ChangeEvent, useEffect } from "react";
+import {KeyboardEvent, useState, type ChangeEvent, useEffect, useRef} from "react";
 import { AiOutlineSend } from "react-icons/ai";
 import { MessageItem } from "../components/MessageItem";
 import { db } from "../db";
@@ -26,6 +26,7 @@ import {
   createChatCompletion,
   createStreamChatCompletion,
 } from "../utils/openai";
+import {ScrollIntoView} from "../components/ScrollIntoView";
 
 export function ChatRoute() {
   const chatId = useChatId();
@@ -77,6 +78,21 @@ export function ChatRoute() {
       setModel(settings.openAiModel);
     }
   });
+
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages]);
+
+  setTimeout(() => {
+    scrollToBottom();
+  }, 500);
+
 
   const submit = async () => {
     if (submitting) return;
@@ -244,6 +260,7 @@ export function ChatRoute() {
           {messages?.map((message) => (
             <MessageItem key={message.id} message={message} />
           ))}
+          <div ref={messagesEndRef} />
         </Stack>
         {submitting && (
           <Card withBorder mt="xs">

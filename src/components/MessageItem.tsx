@@ -21,7 +21,6 @@ import {Message} from "../db";
 import "../styles/markdown.scss";
 import {CreatePromptModal} from "./CreatePromptModal";
 import {LogoIcon} from "./Logo";
-import {ScrollIntoView} from "./ScrollIntoView";
 import LazyLoad from 'react-lazyload';
 import 'property-information';
 
@@ -37,8 +36,7 @@ export function MessageItem({message}: { message: Message }) {
     }, [message.content]);
 
     return (
-        <ScrollIntoView>
-            <LazyLoad height={150} offset={100} unmountIfInvisible={true}>
+            <LazyLoad height={150} offset={50} unmountIfInvisible={true}>
                 <Card withBorder>
                     <Flex gap="sm">
                         {message.role === "user" && (
@@ -115,6 +113,5 @@ export function MessageItem({message}: { message: Message }) {
                     </Flex>
                 </Card>
             </LazyLoad>
-        </ScrollIntoView>
     );
 }
