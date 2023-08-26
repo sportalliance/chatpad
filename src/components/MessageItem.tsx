@@ -20,6 +20,7 @@ import remarkGfm from "remark-gfm";
 import {Message} from "../db";
 import "../styles/markdown.scss";
 import {CreatePromptModal} from "./CreatePromptModal";
+import {Placeholder} from "./Placeholder";
 import {LogoIcon} from "./Logo";
 import LazyLoad from 'react-lazyload';
 import 'property-information';
@@ -36,7 +37,7 @@ export function MessageItem({message}: { message: Message }) {
     }, [message.content]);
 
     return (
-            <LazyLoad height={150} offset={50} unmountIfInvisible={true}>
+            <LazyLoad height={200} offset={20} unmountIfInvisible={true} placeholder={<Placeholder />}>
                 <Card withBorder>
                     <Flex gap="sm">
                         {message.role === "user" && (

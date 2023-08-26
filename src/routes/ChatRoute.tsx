@@ -26,7 +26,6 @@ import {
   createChatCompletion,
   createStreamChatCompletion,
 } from "../utils/openai";
-import {ScrollIntoView} from "../components/ScrollIntoView";
 
 export function ChatRoute() {
   const chatId = useChatId();
@@ -88,10 +87,11 @@ export function ChatRoute() {
   useEffect(() => {
     scrollToBottom()
   }, [messages]);
-
-  setTimeout(() => {
-    scrollToBottom();
-  }, 1000);
+  useEffect(() => {
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1000);
+  }, []);
 
 
   const submit = async () => {
