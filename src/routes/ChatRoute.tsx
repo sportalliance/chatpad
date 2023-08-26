@@ -192,6 +192,7 @@ export function ChatRoute() {
                     if (createChatDescription.usage) {
                         await db.chats.where({id: chatId}).modify((chat) => {
                             chat.description = chatDescription ?? "New Chat";
+                            chat.modelUsed = createChatDescription.model;
                         });
                     }
                 }
