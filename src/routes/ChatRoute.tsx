@@ -91,7 +91,7 @@ export function ChatRoute() {
 
   setTimeout(() => {
     scrollToBottom();
-  }, 500);
+  }, 1000);
 
 
   const submit = async () => {
