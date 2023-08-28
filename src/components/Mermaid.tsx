@@ -50,7 +50,7 @@ interface MermaidProps {
     config?: MermaidConfig;
 }
 
-const Mermaid = memo(function Mermaid({chart, config, id}: MermaidProps) {
+const Mermaid = memo(function Mermaid({chart, config}: MermaidProps) {
 
         const [error, setError] = React.useState<string | undefined>(undefined);
 
@@ -85,7 +85,7 @@ const Mermaid = memo(function Mermaid({chart, config, id}: MermaidProps) {
                     <pre>{error}</pre>
                 </Alert>)}
                 <Code block className="mermaid">
-                    <div id={id} ref={diagramNodeRef}>{chart}</div>
+                    <div ref={diagramNodeRef}>{chart}</div>
                 </Code>
             </>
         )
