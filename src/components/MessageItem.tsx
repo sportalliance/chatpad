@@ -42,7 +42,6 @@ export const MessageItem =  memo(function MessageItem({message}: MessageItemProp
     }, "node" | "className" | "inline" | "lang">) {
         if (className == "language-mermaid") {
             return <Mermaid
-                id={message.id}
                 chart={`${props.children as string}`}
             ></Mermaid>
         }

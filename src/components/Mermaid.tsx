@@ -1,9 +1,9 @@
-import React, {memo, useCallback, useEffect, useRef} from "react"
+import React, {memo, useCallback, useEffect} from "react"
 import mermaid from "mermaid"
 import {MermaidConfig} from "mermaid/dist/config.type";
 import {Alert, Code} from "@mantine/core";
-import {nanoid} from "nanoid";
 import {useTheme} from "@emotion/react";
+import {useId} from "@mantine/hooks";
 
 const DEFAULT_CONFIG: MermaidConfig = {
     startOnLoad: false,
@@ -47,14 +47,12 @@ const DEFAULT_CONFIG: MermaidConfig = {
 
 interface MermaidProps {
     chart: string;
-    id: string;
     config?: MermaidConfig;
 }
 
 const Mermaid = memo(function Mermaid({chart, config, id}: MermaidProps) {
 
         const [error, setError] = React.useState<string | undefined>(undefined);
-        const [diagramSvg, setDiagramSvg] = React.useState<string | undefined>(undefined);
 
         const theme = useTheme();
         const configTheme = {
@@ -64,48 +62,33 @@ const Mermaid = memo(function Mermaid({chart, config, id}: MermaidProps) {
         // Mermaid initilize its config
         mermaid.initialize({...DEFAULT_CONFIG, ...(config || {}), ...configTheme});
 
-        const diagramRef = useRef<HTMLDivElement>(null);
+        const diagramNodeRef = React.useRef<HTMLDivElement>(null);
 
 
-        const updateChart = useCallback(async function () {
-            if (diagramRef.current == null) return;
+        const renderMermaid = useCallback(async function () {
+            if(diagramNodeRef.current == null) return;
             try {
-                const result = await mermaid.render(`${id}-svg`, chart, diagramRef.current);
-                setDiagramSvg(result.svg);
-                setError(undefined);
+                await mermaid.run({nodes: [diagramNodeRef.current]});
             } catch (e) {
-                // @ts-ignore
-                setError(e?.message ?? "Can't parse the mermaid chart");
+                setError(e.message);
             }
-        }, [chart]);
-
+        }, [chart])
         useEffect(() => {
-            updateChart();
+            renderMermaid();
         }, [chart])
 
-
-        const renderDiagram = function () {
-            if (error) {
-                return (
-                    <>
-                        <Alert color="red" title="Invalid">
-                            <p>Couldn't parse the mermaid chart:</p>
-                            <pre>{error}</pre>
-                        </Alert>
-                        <Code block>{chart}</Code>
-                        <div ref={diagramRef}></div>
-                    </>
-                )
-            }
-            return <Code block>
-                <div ref={diagramRef} className="mermaid" dangerouslySetInnerHTML={            // @ts-ignore
-                    {__html: diagramSvg}}/>
-            </Code>
-
-        }
-
         if (!chart) return null
-        return renderDiagram();
+        return (
+            <>
+                {error && (<Alert color="red" title="Invalid">
+                    <p>Couldn't parse the mermaid chart:</p>
+                    <pre>{error}</pre>
+                </Alert>)}
+                <Code block className="mermaid">
+                    <div id={id} ref={diagramNodeRef}>{chart}</div>
+                </Code>
+            </>
+        )
 
 
     }
