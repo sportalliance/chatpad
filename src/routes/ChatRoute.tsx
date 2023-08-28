@@ -28,6 +28,7 @@ import LazyLoad from "react-lazyload";
 import {ChatCompletionMessage} from "openai/resources/chat";
 import {IconClockStop} from "@tabler/icons-react";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
+import {MessageList} from "../components/MessageList";
 
 export function ChatRoute() {
     const chatId = useChatId();
@@ -39,7 +40,6 @@ export function ChatRoute() {
         return db.messages.where("chatId").equals(chatId).sortBy("createdAt");
     }, [chatId]);
 
-    const lastMessages = new Map(messages?.slice(-8)?.map((message) => [message.id, true]));
     const userMessages =
         messages
             ?.filter((message) => message.role === "user")
@@ -83,21 +83,6 @@ export function ChatRoute() {
         }
     });
 
-    const messagesEndRef = useRef(null)
-
-    const scrollToBottom = () => {
-        // @ts-ignore
-        messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
-    }
-
-    useEffect(() => {
-        scrollToBottom()
-    }, [messages]);
-    useEffect(() => {
-        setTimeout(() => {
-            scrollToBottom();
-        }, 1000);
-    }, []);
 
     const abortGeneration = () => {
         generatingRequest?.abort();
@@ -245,27 +230,9 @@ export function ChatRoute() {
 
     if (!chatId) return null;
 
-    function messageRender(message: Message) {
-        if (lastMessages?.has(message.id)) {
-            return (<MessageItem key={message.id} message={message}/>)
-        }
-        return (
-            <LazyLoad key={message.id} height={200} offset={100} unmountIfInvisible={true} placeholder={<Placeholder/>}>
-                <MessageItem message={message}/>
-            </LazyLoad>
-        )
-    }
-
     return (
         <>
-            <Container pt="xl" pb={100}>
-                <Stack spacing="xs">
-                    {messages?.map((message) => (
-                        messageRender(message)
-                    ))}
-                    <div ref={messagesEndRef}/>
-                </Stack>
-            </Container>
+           <MessageList messages={messages}></MessageList>
             <Box
                 py="lg"
                 sx={(theme) => ({

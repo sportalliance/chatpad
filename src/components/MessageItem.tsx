@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ComponentPropsWithoutRef, memo} from 'react';
 
 import {
     ActionIcon,
@@ -25,14 +25,31 @@ import {LogoIcon} from "./Logo";
 import 'property-information';
 import Highlight from 'react-highlight'
 import 'highlight.js/styles/github-dark.css';
-import {useClipboard} from "@mantine/hooks";
+import Mermaid from "./Mermaid";
+import {ReactMarkdownProps} from "react-markdown/lib/complex-types";
 
-export function MessageItem({message}: { message: Message }) {
-    const clipboard = useClipboard({ timeout: 500 });
+export interface MessageItemProps {
+    message: Message;
+}
+export const MessageItem =  memo(function MessageItem({message}: MessageItemProps) {
     const wordCount = useMemo(() => {
         var matches = message.content.match(/[\w\d\’\'-\(\)]+/gi);
         return matches ? matches.length : 0;
     }, [message.content]);
+
+    function getCodeBlock(className: string | undefined, props: Omit<ComponentPropsWithoutRef<"code"> & ReactMarkdownProps & {
+        inline?: boolean
+    }, "node" | "className" | "inline" | "lang">) {
+        if (className == "language-mermaid") {
+            return <Mermaid
+                chart={`${props.children as string}`}
+            ></Mermaid>
+        }
+        return <Highlight
+            className={className}
+            children={`${props.children as string}`}
+        />
+    }
 
     return (
                 <Card withBorder>
@@ -56,12 +73,9 @@ export function MessageItem({message}: { message: Message }) {
 
                                         if (inline) {
                                             return <Code {...props} />;
-                                        }
+                                        };
                                         return <Box sx={{position: "relative"}}>
-                                            <Highlight
-                                                className={className}
-                                                children={`${props.children as string}`}
-                                            />
+                                            {getCodeBlock(className, props)}
                                             <CopyButton value={String(props.children)}>
                                                 {({ copied, copy }) => (
                                                     <Tooltip
@@ -110,4 +124,4 @@ export function MessageItem({message}: { message: Message }) {
                     </Flex>
                 </Card>
     );
-}
+});
