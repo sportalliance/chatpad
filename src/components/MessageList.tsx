@@ -10,8 +10,6 @@ export interface MessageListProps {
 }
 export const MessageList =  memo( function MessageList({messages}: MessageListProps) {
 
-    if (messages == undefined) return null;
-
     const lastMessages = new Map(messages?.slice(-8)?.map((message) => [message.id, true]));
 
     function messageRender(message: Message) {
