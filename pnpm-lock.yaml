@@ -32,18 +32,6 @@ dependencies:
   '@tanstack/react-location':
     specifier: ^3.7.4
     version: 3.7.4(react-dom@18.2.0)(react@18.2.0)
-  '@types/node':
-    specifier: 20.5.6
-    version: 20.5.6
-  '@types/react':
-    specifier: 18.2.21
-    version: 18.2.21
-  '@types/react-dom':
-    specifier: 18.2.7
-    version: 18.2.7
-  '@types/react-virtualized':
-    specifier: ^9.21.22
-    version: 9.21.22
   dexie:
     specifier: ^3.2.4
     version: 3.2.4
@@ -133,12 +121,24 @@ devDependencies:
   '@types/mermaid':
     specifier: ^9.2.0
     version: 9.2.0
+  '@types/node':
+    specifier: 20.5.6
+    version: 20.5.6
+  '@types/react':
+    specifier: ^18.0.28
+    version: 18.2.21
+  '@types/react-dom':
+    specifier: ^18.0.11
+    version: 18.2.7
   '@types/react-highlight':
     specifier: ^0.12.5
     version: 0.12.5
   '@types/react-lazyload':
     specifier: ^3.2.0
     version: 3.2.0
+  '@types/react-virtualized':
+    specifier: ^9.21.22
+    version: 9.21.22
   buffer:
     specifier: ^6.0.3
     version: 6.0.3
@@ -1912,7 +1912,6 @@ packages:
 
   /@types/node@20.5.6:
     resolution: {integrity: sha512-Gi5wRGPbbyOTX+4Y2iULQ27oUPrefaB0PxGQJnfyWN3kvEDGM3mIB5M/gQLmitZf7A9FmLeaqxD3L1CXpm3VKQ==}
-    dev: false
 
   /@types/parse-json@4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
@@ -1925,7 +1924,7 @@ packages:
     resolution: {integrity: sha512-GRaAEriuT4zp9N4p1i8BDBYmEyfo+xQ3yHjJU4eiK5NDa1RmUZG+unZABUTK4/Ox/M+GaHwb6Ow8rUITrtjszA==}
     dependencies:
       '@types/react': 18.2.21
-    dev: false
+    dev: true
 
   /@types/react-highlight@0.12.5:
     resolution: {integrity: sha512-P8+mTxltxDdQ+99l+pjn40clziSbNrZy5d5zmvG+j3jKzokAhCoCZlIRmmnFgETTYubuqwKjvXSlvesBZcTfvQ==}
@@ -1944,7 +1943,7 @@ packages:
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/react': 18.2.21
-    dev: false
+    dev: true
 
   /@types/react@18.2.21:
     resolution: {integrity: sha512-neFKG/sBAwGxHgXiIxnbm3/AAVQ/cMRS93hvBpg8xYRbeQSPVABp9U2bRnPf0iI4+Ucdv3plSxKK+3CW2ENJxA==}
