@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  highlight.js: ^11.8.0
+
 dependencies:
   '@emotion/react':
     specifier: ^11.11.1
@@ -84,7 +87,7 @@ dependencies:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
   react-highlight:
-    specifier: github:frontstall/react-highlight#master
+    specifier: ^0.15.0
     version: 0.15.0
   react-icons:
     specifier: ^4.10.1
@@ -3682,10 +3685,6 @@ packages:
   /heap@0.2.7:
     resolution: {integrity: sha512-2bsegYkkHO+h/9MGbn6KWcE45cHZgPANo5LXF7EvWdT0yT2EguSVO1nDgU5c8+ZOPwp2vMNa7YFsJhVcDR9Sdg==}
 
-  /highlight.js@10.7.3:
-    resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==}
-    dev: false
-
   /highlight.js@11.8.0:
     resolution: {integrity: sha512-MedQhoqVdr0U6SSnWPzfiadUcDHfN/Wzq25AkXiQv9oiOO/sG0S7XkvpFIqWBl9Yq1UYyYOOVORs5UW2XlPyzg==}
     engines: {node: '>=12.0.0'}
@@ -5209,7 +5208,7 @@ packages:
   /react-highlight@0.15.0:
     resolution: {integrity: sha512-5uV/b/N4Z421GSVVe05fz+OfTsJtFzx/fJBdafZyw4LS70XjIZwgEx3Lrkfc01W/RzZ2Dtfb0DApoaJFAIKBtA==}
     dependencies:
-      highlight.js: 10.7.3
+      highlight.js: 11.8.0
     dev: false
 
   /react-icons@4.10.1(react@18.2.0):

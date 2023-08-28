@@ -56,12 +56,17 @@
     "openai-ext": "^1.2.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-highlight": "github:frontstall/react-highlight#master",
+    "react-highlight": "^0.15.0",
     "react-icons": "^4.10.1",
     "react-lazyload": "^3.2.0",
     "react-markdown": "^8.0.7",
     "react-virtualized": "^9.22.5",
     "remark-gfm": "^3.0.1",
     "typescript": "5.2.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "highlight.js": "^11.8.0"
+    }
   }
 }
