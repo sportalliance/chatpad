@@ -28,6 +28,7 @@ export async function updateChatTitle(chat: Chat, apiKey: string) {
             const description = chatDescription ?? "New Chat";
             chat.description = trim(description, "\"");
             chat.modelUsed = createChatDescription.model;
+            chat.updatedAt = new Date();
         });
     }
 }

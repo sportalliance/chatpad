@@ -150,6 +150,7 @@ export function Layout() {
                                             createdAt: new Date(),
                                             modelUsed: undefined,
                                             isNewChat: true,
+                                            updatedAt: new Date(),
                                         });
                                         navigate({to: `/chats/${id}`});
                                     }}

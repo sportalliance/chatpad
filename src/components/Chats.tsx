@@ -12,7 +12,7 @@ import { MainLink } from "./MainLink";
 export function Chats({ search }: { search: string }) {
   const chatId = useChatId();
   const chats = useLiveQuery(() =>
-    db.chats.orderBy("createdAt").reverse().toArray()
+    db.chats.orderBy("updatedAt").reverse().toArray()
   );
   const filteredChats = useMemo(
     () =>

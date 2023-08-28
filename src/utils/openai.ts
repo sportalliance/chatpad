@@ -95,6 +95,7 @@ async function setTotalTokens(chatId: string, content: string) {
         chat.totalPromptTokens = gptTokens.promptUsedTokens;
         chat.totalCompletionTokens = gptTokens.completionUsedTokens;
         chat.totalPriceUsd = gptTokens.usedUSD;
+        chat.updatedAt = new Date();
     });
 }
 

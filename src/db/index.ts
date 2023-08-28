@@ -12,6 +12,7 @@ export interface Chat {
     createdAt: Date;
     totalPriceUsd?:number;
     isNewChat?: Boolean;
+    updatedAt: Date;
 }
 
 export interface Message {
@@ -53,6 +54,17 @@ export class Database extends Dexie {
             messages: "id, chatId, createdAt, [chatId+role]",
             prompts: "id, createdAt",
             settings: "id",
+        });
+
+        this.version(6).stores({
+            chats: "id, createdAt, updatedAt",
+            messages: "id, chatId, createdAt, [chatId+role]",
+            prompts: "id, createdAt",
+            settings: "id",
+        }).upgrade(trans => {
+            return trans.db.table("chats").toCollection().modify(chat => {
+                chat.updatedAt = chat.createdAt;
+            });
         });
 
         this.on("populate", async () => {

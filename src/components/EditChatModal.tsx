@@ -30,6 +30,7 @@ export function EditChatModal({
               event.preventDefault();
               await db.chats.where({ id: chat.id }).modify((chat) => {
                 chat.description = value;
+                chat.updatedAt = new Date();
               });
               notifications.show({
                 title: "Saved",
