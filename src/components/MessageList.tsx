@@ -1,5 +1,5 @@
 import {Message} from "../db";
-import {Container, List, Stack} from "@mantine/core";
+import {Container, Stack} from "@mantine/core";
 import React, {memo, useEffect, useRef} from "react";
 import {MessageItem} from "./MessageItem";
 import LazyLoad from "react-lazyload";

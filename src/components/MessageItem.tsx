@@ -124,4 +124,4 @@ export const MessageItem =  memo(function MessageItem({message}: MessageItemProp
                     </Flex>
                 </Card>
     );
-});
+}, (prevProps, nextProps) => prevProps.message.content == nextProps.message.content);
