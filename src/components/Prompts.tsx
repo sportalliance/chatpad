@@ -97,7 +97,7 @@ export function Prompts({
                                         modelUsed: undefined,
                                         totalCompletionTokens: 0,
                                         totalPromptTokens: 0,
-                                        isNewChat: false,
+                                        isNewChat: true,
                                         updatedAt: new Date(),
                                     };
                                     await db.chats.add(chat);
