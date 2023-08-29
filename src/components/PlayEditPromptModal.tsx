@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import {useDisclosure} from "@mantine/hooks";
 import {notifications} from "@mantine/notifications";
-import {IconBookmarkEdit, IconPencil, IconPlayCard} from "@tabler/icons-react";
+import {IconBookmarkEdit, IconEyeEdit, IconPencil, IconPlayCard} from "@tabler/icons-react";
 import {useEffect, useState} from "react";
 import {Chat, db, Prompt} from "../db";
 import {useLiveQuery} from "dexie-react-hooks";
@@ -131,7 +131,7 @@ export function PlayEditPromptModal({prompt}: { prompt: Prompt }) {
             </Modal>
             <Tooltip label="Edit before starting chat">
                 <ActionIcon size="lg" onClick={open}>
-                    <IconBookmarkEdit size={20}/>
+                    <IconEyeEdit size={20}/>
                 </ActionIcon>
             </Tooltip>
         </>
