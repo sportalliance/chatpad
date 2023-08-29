@@ -9,6 +9,7 @@ import {createChatCompletion, createStreamChatCompletion} from "../utils/openai"
 import {DeletePromptModal} from "./DeletePromptModal";
 import {EditPromptModal} from "./EditPromptModal";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
+import {PlayEditPromptModal} from "./PlayEditPromptModal";
 
 export function Prompts({
                             onPlay,
@@ -141,6 +142,7 @@ export function Prompts({
                                 <IconPlayerPlay size={20}/>
                             </ActionIcon>
                         </Tooltip>
+                        <PlayEditPromptModal prompt={prompt} />
                         <EditPromptModal prompt={prompt}/>
                         <DeletePromptModal prompt={prompt}/>
                     </Group>

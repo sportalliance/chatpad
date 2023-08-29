@@ -44,6 +44,7 @@ export function EditPromptModal({ prompt }: { prompt: Prompt }) {
                 title: "Saved",
                 message: "Prompt updated",
               });
+              close();
             } catch (error: any) {
               if (error.toJSON().message === "Network Error") {
                 notifications.show({
