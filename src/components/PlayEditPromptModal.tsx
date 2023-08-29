@@ -17,12 +17,14 @@ import {nanoid} from "nanoid";
 import {createStreamChatCompletion} from "../utils/openai";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {useNavigate} from "@tanstack/react-location";
+import {Model, ModelChooser} from "./ModelChooser";
 
-export function PlayEditPromptModal({prompt}: { prompt: Prompt }) {
+export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: () => void; }) {
     const navigate = useNavigate();
 
     const [opened, {open, close}] = useDisclosure(false);
     const [submitting, setSubmitting] = useState(false);
+    const [model, setModel] = useState<Model>("gpt-3.5-turbo");
 
     const [content, setContent] = useState("");
     const apiKey = useLiveQuery(async () => {
@@ -49,7 +51,7 @@ export function PlayEditPromptModal({prompt}: { prompt: Prompt }) {
                                 description: "New Chat",
                                 totalTokens: 0,
                                 createdAt: new Date(),
-                                modelUsed: undefined,
+                                modelUsed: model,
                                 totalCompletionTokens: 0,
                                 totalPromptTokens: 0,
                                 isNewChat: true,
@@ -92,6 +94,7 @@ export function PlayEditPromptModal({prompt}: { prompt: Prompt }) {
                                 messageId,
                                 async () => await updateChatTitle(chat, apiKey));
                             close();
+                            onPlay();
 
                         } catch (error: any) {
                             if (error.toJSON().message === "Network Error") {
@@ -114,6 +117,7 @@ export function PlayEditPromptModal({prompt}: { prompt: Prompt }) {
                         }
                     }}
                 >
+                    <ModelChooser value={model} onChange={async newModel => setModel(newModel)}></ModelChooser>
                     <Stack>
                         <Textarea
                             label="Content"

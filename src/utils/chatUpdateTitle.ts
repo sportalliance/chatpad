@@ -9,7 +9,7 @@ export async function updateChatTitle(chat: Chat, apiKey: string) {
     const messages = await db.messages
         .where({chatId: chat.id})
         .sortBy("createdAt");
-    const createChatDescription = await createChatCompletion(apiKey, [
+    const createChatDescription = await createChatCompletion(apiKey, chat.id,[
         ...(messages ?? []).map((message) => ({
             role: message.role,
             content: message.content,

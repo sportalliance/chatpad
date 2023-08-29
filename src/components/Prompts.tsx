@@ -142,7 +142,7 @@ export function Prompts({
                                 <IconPlayerPlay size={20}/>
                             </ActionIcon>
                         </Tooltip>
-                        <PlayEditPromptModal prompt={prompt} />
+                        <PlayEditPromptModal prompt={prompt} onPlay={onPlay}/>
                         <EditPromptModal prompt={prompt}/>
                         <DeletePromptModal prompt={prompt}/>
                     </Group>

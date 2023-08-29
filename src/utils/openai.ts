@@ -35,7 +35,7 @@ export async function createStreamChatCompletion(
     const model = chat?.modelUsed ?? settings?.openAiModel ?? config.defaultModel;
     const chatCompletionsUrl = settings?.openAiApiBase ? settings?.openAiApiBase + "/chat/completions" : undefined;
 
-    if(model != chat?.modelUsed) {
+    if (model != chat?.modelUsed) {
         await db.chats.where({id: chatId}).modify((chat) => {
             chat.modelUsed = model;
         });
@@ -57,7 +57,7 @@ export async function createStreamChatCompletion(
                     }
                 },
                 async onDone(stream) {
-                    if(onDone) {
+                    if (onDone) {
                         await onDone();
                     }
                 },
@@ -101,10 +101,12 @@ async function setTotalTokens(chatId: string, content: string) {
 
 export async function createChatCompletion(
     apiKey: string,
+    chatId: string,
     messages: ChatCompletionMessage[]
 ) {
+    const chat = await db.chats.get(chatId);
     const settings = await db.settings.get("general");
-    const model = settings?.openAiModel ?? config.defaultModel;
+    const model = chat?.modelUsed ?? settings?.openAiModel ?? config.defaultModel;
     const type = settings?.openAiApiType ?? config.defaultType;
     const auth = settings?.openAiApiAuth ?? config.defaultAuth;
     const base = settings?.openAiApiBase ?? config.defaultBase;
@@ -131,7 +133,7 @@ export async function createChatCompletion(
 }
 
 export async function checkOpenAIKey(apiKey: string) {
-    return createChatCompletion(apiKey, [
+    return createChatCompletion(apiKey,"", [
         {
             role: "user",
             content: "hello",
