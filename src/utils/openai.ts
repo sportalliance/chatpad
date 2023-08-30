@@ -46,29 +46,27 @@ export async function createStreamChatCompletion(
             if (part.model) {
                 model = part.model;
             }
-            setStreamContent(messageId, content, contentPart === undefined);
+            await setStreamContent(messageId, content, contentPart === undefined);
             if (cancellationToken.reason) {
                 break;
             }
         }
     } finally {
         if (model != chat?.modelUsed) {
-            await db.chats.where({id: chatId}).modify((chat) => {
-                chat.modelUsed = model;
-            });
+            await db.chats.update(chatId, {modelUsed: model});
         }
         await setTotalTokens(chatId, content);
         await updateChatTitle((await db.chats.get(chatId))!);
     }
 }
 
-function setStreamContent(
+async function setStreamContent(
     messageId: string,
     content: string,
     isFinal: boolean
 ) {
     content = isFinal ? content : content + "█";
-    db.messages.update(messageId, {content: content});
+    await db.messages.update(messageId, {content: content});
 }
 
 async function setTotalTokens(chatId: string, content: string) {
