@@ -11,6 +11,7 @@ import {EditPromptModal} from "./EditPromptModal";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {PlayEditPromptModal} from "./PlayEditPromptModal";
 import {CancelToken} from "cancel-token";
+import {handleChatError} from "../utils/handleChatErrors";
 
 export function Prompts({
                             onPlay,
@@ -90,7 +91,7 @@ export function Prompts({
                                     if (!apiKey) return;
                                     const chatId = nanoid();
                                     prompt.system ??= "You are ChatGPT, a large language model trained by OpenAI. You are a helpful bot that chats with users. Always answer in markdown (no code block around it).";
-                                    const chat : Chat = {
+                                    const chat: Chat = {
                                         id: chatId,
                                         description: "New Chat",
                                         totalTokens: 0,
@@ -129,14 +130,19 @@ export function Prompts({
                                     navigate({to: `/chats/${chatId}`});
                                     onPlay();
 
-                                    await createStreamChatCompletion([
-                                        {
-                                            role: "system",
-                                            content: prompt.system,
-                                        },
-                                        {role: "user", content: prompt.content},
-                                    ], chatId, messageId, CancelToken.source().token);
-                                }}
+                                    try {
+                                        await createStreamChatCompletion([
+                                            {
+                                                role: "system",
+                                                content: prompt.system,
+                                            },
+                                            {role: "user", content: prompt.content},
+                                        ], chatId, messageId, CancelToken.source().token);
+                                    } catch (e) {
+                                        handleChatError(e);
+                                    }
+                                }
+                                }
                             >
                                 <IconPlayerPlay size={20}/>
                             </ActionIcon>

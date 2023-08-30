@@ -21,15 +21,15 @@ import {config} from "../utils/config";
 import {createStreamChatCompletion,} from "../utils/openai";
 import {ChatCompletionMessage} from "openai/resources/chat";
 import {IconClockStop} from "@tabler/icons-react";
-import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {MessageList} from "../components/MessageList";
 import {ModelChooser} from "../components/ModelChooser";
 import {useApiKey} from "../hooks/useApiKey";
-import {Cancel, CancelFunction, CancelToken} from "cancel-token";
+import {CancelFunction, CancelToken} from "cancel-token";
+import {handleChatError} from "../utils/handleChatErrors";
 
 export function ChatRoute() {
     const chatId = useChatId();
-    const apiKey = useLiveQuery(() =>  useApiKey());
+    const apiKey = useLiveQuery(() => useApiKey());
     const messages = useLiveQuery(() => {
         if (!chatId) return [];
         return db.messages.where("chatId").equals(chatId).sortBy("createdAt");
@@ -161,25 +161,9 @@ export function ChatRoute() {
 
 
         } catch (error: any) {
-            if (error.toJSON().message === "Network Error") {
-                notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message: "No internet connection.",
-                });
-            }
-            const message = error.response?.data?.error?.message;
-            if (message) {
-                notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message,
-                });
-            }
+            handleChatError(error);
         } finally {
-            if (chat?.isNewChat || chat?.isNewChat === undefined) {
-                await db.chats.where({id: chatId}).modify({isNewChat: false});
-            }
+            setSubmitting(false);
         }
     };
 
@@ -219,7 +203,7 @@ export function ChatRoute() {
 
     return (
         <>
-           <MessageList messages={messages}></MessageList>
+            <MessageList messages={messages}></MessageList>
             <Box
                 py="lg"
                 sx={(theme) => ({

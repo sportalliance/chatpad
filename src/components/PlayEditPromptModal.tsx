@@ -19,6 +19,7 @@ import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {useNavigate} from "@tanstack/react-location";
 import {Model, ModelChooser} from "./ModelChooser";
 import {CancelToken} from "cancel-token";
+import {handleChatError} from "../utils/handleChatErrors";
 
 export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: () => void; }) {
     const navigate = useNavigate();
@@ -96,21 +97,7 @@ export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: 
                             ], chatId, messageId, CancelToken.source().token);
 
                         } catch (error: any) {
-                            if (error.toJSON().message === "Network Error") {
-                                notifications.show({
-                                    title: "Error",
-                                    color: "red",
-                                    message: "No internet connection.",
-                                });
-                            }
-                            const message = error.response?.data?.error?.message;
-                            if (message) {
-                                notifications.show({
-                                    title: "Error",
-                                    color: "red",
-                                    message,
-                                });
-                            }
+                            handleChatError(error);
                         } finally {
                             setSubmitting(false);
                         }
