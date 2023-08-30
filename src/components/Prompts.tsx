@@ -5,7 +5,7 @@ import {useLiveQuery} from "dexie-react-hooks";
 import {nanoid} from "nanoid";
 import {useMemo} from "react";
 import {Chat, db} from "../db";
-import {createChatCompletion, createStreamChatCompletion} from "../utils/openai";
+import {createStreamChatCompletion} from "../utils/openai";
 import {DeletePromptModal} from "./DeletePromptModal";
 import {EditPromptModal} from "./EditPromptModal";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
@@ -128,15 +128,13 @@ export function Prompts({
                                     navigate({to: `/chats/${chatId}`});
                                     onPlay();
 
-                                    await createStreamChatCompletion(apiKey, [
-                                            {
-                                                role: "system",
-                                                content: prompt.system,
-                                            },
-                                            {role: "user", content: prompt.content},
-                                        ], chatId,
-                                        messageId,
-                                        async () => await updateChatTitle(chat, apiKey));
+                                    await createStreamChatCompletion([
+                                        {
+                                            role: "system",
+                                            content: prompt.system,
+                                        },
+                                        {role: "user", content: prompt.content},
+                                    ], chatId, messageId, async () => await updateChatTitle(chat));
                                 }}
                             >
                                 <IconPlayerPlay size={20}/>

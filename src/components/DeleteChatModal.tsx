@@ -16,13 +16,6 @@ export function DeleteChatModal({
 }) {
   const [opened, { open, close }] = useDisclosure(false);
   const [submitting, setSubmitting] = useState(false);
-
-  const [key, setKey] = useApiKey();
-
-  const [value, setValue] = useState("");
-  useEffect(() => {
-    setValue(key);
-  }, [key]);
   const chatId = useChatId();
   const navigate = useNavigate();
 

@@ -5,6 +5,7 @@ import {db} from "../db";
 import {config} from "./config";
 import {ChatCompletionMessage} from "openai/resources/chat";
 import {GPTTokens, supportModelType} from "gpt-tokens/index";
+import {useApiKey} from "../hooks/useApiKey";
 
 function getClient(
     apiKey: string,
@@ -24,7 +25,6 @@ function getClient(
 }
 
 export async function createStreamChatCompletion(
-    apiKey: string,
     messages: ChatCompletionMessage[],
     chatId: string,
     messageId: string,
@@ -35,6 +35,7 @@ export async function createStreamChatCompletion(
     const model = chat?.modelUsed ?? settings?.openAiModel ?? config.defaultModel;
     const chatCompletionsUrl = settings?.openAiApiBase ? settings?.openAiApiBase + "/chat/completions" : undefined;
 
+    const apiKey = await useApiKey();
     if (model != chat?.modelUsed) {
         await db.chats.where({id: chatId}).modify((chat) => {
             chat.modelUsed = model;
@@ -47,7 +48,7 @@ export async function createStreamChatCompletion(
             messages,
         },
         {
-            apiKey: apiKey,
+            apiKey: apiKey ?? "",
             chatCompletionsUrl: chatCompletionsUrl,
             handler: {
                 onContent(content, isFinal, stream) {
@@ -100,6 +101,14 @@ async function setTotalTokens(chatId: string, content: string) {
 }
 
 export async function createChatCompletion(
+    chatId: string,
+    messages: ChatCompletionMessage[]
+) {
+    const apiKey = await useApiKey();
+    return createChatCompletionInternal(apiKey ?? "", chatId, messages);
+}
+
+async function createChatCompletionInternal(
     apiKey: string,
     chatId: string,
     messages: ChatCompletionMessage[]
@@ -133,7 +142,7 @@ export async function createChatCompletion(
 }
 
 export async function checkOpenAIKey(apiKey: string) {
-    return createChatCompletion(apiKey,"", [
+    return createChatCompletionInternal(apiKey,"", [
         {
             role: "user",
             content: "hello",

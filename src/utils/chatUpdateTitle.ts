@@ -2,14 +2,14 @@ import {Chat, db} from "../db";
 import {createChatCompletion} from "./openai";
 import {trim} from "./trim";
 
-export async function updateChatTitle(chat: Chat, apiKey: string) {
+export async function updateChatTitle(chat: Chat) {
     if (!(chat?.isNewChat || chat?.isNewChat === undefined)) {
         return;
     }
     const messages = await db.messages
         .where({chatId: chat.id})
         .sortBy("createdAt");
-    const createChatDescription = await createChatCompletion(apiKey, chat.id, [
+    const createChatDescription = await createChatCompletion(chat.id, [
         ...(messages ?? []).map((message) => ({
             role: message.role,
             content: message.content,

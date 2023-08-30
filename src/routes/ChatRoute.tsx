@@ -24,12 +24,11 @@ import {IconClockStop} from "@tabler/icons-react";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {MessageList} from "../components/MessageList";
 import {ModelChooser} from "../components/ModelChooser";
+import {useApiKey} from "../hooks/useApiKey";
 
 export function ChatRoute() {
     const chatId = useChatId();
-    const apiKey = useLiveQuery(async () => {
-        return (await db.settings.where({id: "general"}).first())?.openAiApiKey;
-    });
+    const apiKey = useLiveQuery(() =>  useApiKey());
     const messages = useLiveQuery(() => {
         if (!chatId) return [];
         return db.messages.where("chatId").equals(chatId).sortBy("createdAt");
@@ -100,11 +99,11 @@ export function ChatRoute() {
             return;
         }
 
-        if (!apiKey) {
+        if (apiKey === undefined) {
             notifications.show({
                 title: "Error",
                 color: "red",
-                message: "OpenAI API Key is not defined. Please set your API Key",
+                message: "OpenAI API Key is not defined. Please set your API Key or disable API Key authentication.",
             });
             return;
         }
@@ -152,19 +151,13 @@ export function ChatRoute() {
             if (chat?.isNewChat || chat?.isNewChat === undefined) {
                 messagesToSend.push({role: "system", content: systemMessage})
             }
-            const request = await createStreamChatCompletion(
-                apiKey,
-                messagesToSend,
-                chatId,
-                messageId,
-                async () => {
-                    try {
-                        await updateChatTitle(chat!, apiKey);
-                    } finally {
-                        setSubmitting(false);
-                    }
+            const request = await createStreamChatCompletion(messagesToSend, chatId, messageId, async () => {
+                try {
+                    await updateChatTitle(chat!);
+                } finally {
+                    setSubmitting(false);
                 }
-            );
+            });
             setGeneratingRequest(request);
 
 

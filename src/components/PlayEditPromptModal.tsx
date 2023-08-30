@@ -84,15 +84,13 @@ export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: 
 
                             navigate({to: `/chats/${chatId}`});
 
-                            await createStreamChatCompletion(apiKey, [
-                                    {
-                                        role: "system",
-                                        content: prompt.system,
-                                    },
-                                    {role: "user", content: content},
-                                ], chatId,
-                                messageId,
-                                async () => await updateChatTitle(chat, apiKey));
+                            await createStreamChatCompletion([
+                                {
+                                    role: "system",
+                                    content: prompt.system,
+                                },
+                                {role: "user", content: content},
+                            ], chatId, messageId, async () => await updateChatTitle(chat));
                             close();
                             onPlay();
 
