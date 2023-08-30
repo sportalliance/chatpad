@@ -1,24 +1,23 @@
-import {encode} from "gpt-token-utils";
 import {ClientOptions, OpenAI} from "openai";
-import {OpenAIExt} from "openai-ext";
 import {db} from "../db";
 import {config} from "./config";
-import {ChatCompletionMessage} from "openai/resources/chat";
+import {ChatCompletion, ChatCompletionMessage, Completions} from "openai/resources/chat";
 import {GPTTokens, supportModelType} from "gpt-tokens/index";
 import {useApiKey} from "../hooks/useApiKey";
+import {CancelToken} from "cancel-token";
+import ChatCompletionChunk = Completions.ChatCompletionChunk;
+import {Stream} from "openai/streaming";
+import {updateChatTitle} from "./chatUpdateTitle";
 
 function getClient(
-    apiKey: string,
     apiType: string,
     apiAuth: string,
-    basePath: string
+    basePath: string,
+    apiKey?: string | null
 ) {
     const configuration: ClientOptions = {
-        ...((apiType === "openai" ||
-            (apiType === "custom" && apiAuth === "bearer-token")) && {
-            apiKey: apiKey,
-        }),
-        ...(apiType === "custom" && {basePath: basePath}),
+        apiKey: apiKey!,
+        ...(apiType === "custom" && {baseURL: basePath}),
         dangerouslyAllowBrowser: true,
     };
     return new OpenAI(configuration);
@@ -28,46 +27,39 @@ export async function createStreamChatCompletion(
     messages: ChatCompletionMessage[],
     chatId: string,
     messageId: string,
-    onDone?: () => Promise<void>
+    cancellationToken: CancelToken,
 ) {
     const chat = await db.chats.get(chatId);
     const settings = await db.settings.get("general");
-    const model = chat?.modelUsed ?? settings?.openAiModel ?? config.defaultModel;
-    const chatCompletionsUrl = settings?.openAiApiBase ? settings?.openAiApiBase + "/chat/completions" : undefined;
-
+    let model = chat?.modelUsed ?? settings?.openAiModel ?? config.defaultModel;
     const apiKey = await useApiKey();
-    if (model != chat?.modelUsed) {
-        await db.chats.where({id: chatId}).modify((chat) => {
-            chat.modelUsed = model;
-        });
-    }
 
-    return OpenAIExt.streamClientChatCompletion(
-        {
-            model,
-            messages,
-        },
-        {
-            apiKey: apiKey ?? "",
-            chatCompletionsUrl: chatCompletionsUrl,
-            handler: {
-                onContent(content, isFinal, stream) {
-                    setStreamContent(messageId, content, isFinal);
-                    if (isFinal) {
-                        setTotalTokens(chatId, content);
-                    }
-                },
-                async onDone(stream) {
-                    if (onDone) {
-                        await onDone();
-                    }
-                },
-                onError(error, stream) {
-                    console.error(error);
-                },
-            },
+    const response: Stream<ChatCompletionChunk> = await createChatCompletionInternal(apiKey ?? "", chatId, messages, true) as any;
+
+    let content = "";
+    try {
+        for await (const part of response) {
+            const contentPart = part.choices[0].delta.content!;
+            if (contentPart) {
+                content += contentPart;
+            }
+            if (part.model) {
+                model = part.model;
+            }
+            setStreamContent(messageId, content, contentPart === undefined);
+            if (cancellationToken.reason) {
+                break;
+            }
         }
-    );
+    } finally {
+        if (model != chat?.modelUsed) {
+            await db.chats.where({id: chatId}).modify((chat) => {
+                chat.modelUsed = model;
+            });
+        }
+        await setTotalTokens(chatId, content);
+        await updateChatTitle((await db.chats.get(chatId))!);
+    }
 }
 
 function setStreamContent(
@@ -105,13 +97,14 @@ export async function createChatCompletion(
     messages: ChatCompletionMessage[]
 ) {
     const apiKey = await useApiKey();
-    return createChatCompletionInternal(apiKey ?? "", chatId, messages);
+    return createChatCompletionInternal(apiKey ?? "", chatId, messages) as any as ChatCompletion;
 }
 
 async function createChatCompletionInternal(
     apiKey: string,
     chatId: string,
-    messages: ChatCompletionMessage[]
+    messages: ChatCompletionMessage[],
+    stream: boolean = false
 ) {
     const chat = await db.chats.get(chatId);
     const settings = await db.settings.get("general");
@@ -121,11 +114,11 @@ async function createChatCompletionInternal(
     const base = settings?.openAiApiBase ?? config.defaultBase;
     const version = settings?.openAiApiVersion ?? config.defaultVersion;
 
-    const client = getClient(apiKey, type, auth, base);
+    const client = getClient(type, auth, base, apiKey);
     return client.chat.completions.create(
         {
             model,
-            stream: false,
+            stream: stream,
             messages,
         },
 
@@ -142,7 +135,7 @@ async function createChatCompletionInternal(
 }
 
 export async function checkOpenAIKey(apiKey: string) {
-    return createChatCompletionInternal(apiKey,"", [
+    return createChatCompletionInternal(apiKey, "", [
         {
             role: "user",
             content: "hello",

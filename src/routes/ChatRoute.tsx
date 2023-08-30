@@ -25,6 +25,7 @@ import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {MessageList} from "../components/MessageList";
 import {ModelChooser} from "../components/ModelChooser";
 import {useApiKey} from "../hooks/useApiKey";
+import {Cancel, CancelFunction, CancelToken} from "cancel-token";
 
 export function ChatRoute() {
     const chatId = useChatId();
@@ -42,7 +43,10 @@ export function ChatRoute() {
     const [content, setContent] = useState("");
     const [contentDraft, setContentDraft] = useState("");
     const [submitting, setSubmitting] = useState(false);
-    const [generatingRequest, setGeneratingRequest] = useState<XMLHttpRequest | undefined>(undefined);
+    const [cancellationToken, setCancellationToken] = useState<{
+        token: CancelToken;
+        cancel: CancelFunction;
+    }>(CancelToken.source());
 
     const chat = useLiveQuery(async () => {
         if (!chatId) return null;
@@ -79,7 +83,8 @@ export function ChatRoute() {
 
 
     const abortGeneration = () => {
-        generatingRequest?.abort();
+        cancellationToken.cancel("user cancelled");
+        setCancellationToken(CancelToken.source());
         setSubmitting(false);
         notifications.show({
             title: "Stopped",
@@ -151,14 +156,8 @@ export function ChatRoute() {
             if (chat?.isNewChat || chat?.isNewChat === undefined) {
                 messagesToSend.push({role: "system", content: systemMessage})
             }
-            const request = await createStreamChatCompletion(messagesToSend, chatId, messageId, async () => {
-                try {
-                    await updateChatTitle(chat!);
-                } finally {
-                    setSubmitting(false);
-                }
-            });
-            setGeneratingRequest(request);
+            await createStreamChatCompletion(messagesToSend, chatId, messageId, cancellationToken.token);
+            setSubmitting(false);
 
 
         } catch (error: any) {

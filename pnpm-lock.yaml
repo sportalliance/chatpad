@@ -35,6 +35,9 @@ dependencies:
   '@tanstack/react-location':
     specifier: ^3.7.4
     version: 3.7.4(react-dom@18.2.0)(react@18.2.0)
+  cancel-token:
+    specifier: ^0.1.1
+    version: 0.1.1
   dexie:
     specifier: ^3.2.4
     version: 3.2.4
@@ -80,9 +83,6 @@ dependencies:
   openai:
     specifier: ^4.2.0
     version: 4.2.0
-  openai-ext:
-    specifier: ^1.2.7
-    version: 1.2.7
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -1914,6 +1914,10 @@ packages:
   /@types/node@20.5.7:
     resolution: {integrity: sha512-dP7f3LdZIysZnmvP3ANJYTSwg+wLLl8p7RqniVlV7j+oXSXAbt9h0WIBFmJy5inWZoX9wZN6eXx+YXd9Rh3RBA==}
 
+  /@types/node@4.9.5:
+    resolution: {integrity: sha512-+8fpgbXsbATKRF2ayAlYhPl2E9MPdLjrnK/79ZEpyPJ+k7dZwJm9YM8FK+l4rqL//xHk7PgQhGwz6aA2ckxbCQ==}
+    dev: false
+
   /@types/parse-json@4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: false
@@ -2310,6 +2314,12 @@ packages:
   /callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
+
+  /cancel-token@0.1.1:
+    resolution: {integrity: sha512-22DV8aB/ovjL6l9S+QLwFzyP5+azENgfNywoJffIE8ZNx2Nnz7UlJ0mEULTtaeuf+tmnvaUdN6WKtV1LTBlbuA==}
+    dependencies:
+      '@types/node': 4.9.5
+    dev: false
 
   /caniuse-lite@1.0.30001523:
     resolution: {integrity: sha512-I5q5cisATTPZ1mc588Z//pj/Ox80ERYDfR71YnvY7raS/NOk8xXlZcB0sF7JdqaV//kOaa6aus7lRfpdnt1eBA==}
@@ -5051,10 +5061,6 @@ packages:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
     dependencies:
       wrappy: 1.0.2
-    dev: false
-
-  /openai-ext@1.2.7:
-    resolution: {integrity: sha512-XyONn0cZ0qVLNr0qs/eRZVkccj/PntOj1Vl+++4ztLc//N405vLmDY4aLS33XfRMWa1nFyTPY6WTvMYDso0JeA==}
     dev: false
 
   /openai@3.3.0:

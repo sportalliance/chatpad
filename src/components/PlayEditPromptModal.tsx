@@ -18,6 +18,7 @@ import {createStreamChatCompletion} from "../utils/openai";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {useNavigate} from "@tanstack/react-location";
 import {Model, ModelChooser} from "./ModelChooser";
+import {CancelToken} from "cancel-token";
 
 export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: () => void; }) {
     const navigate = useNavigate();
@@ -90,7 +91,8 @@ export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: 
                                     content: prompt.system,
                                 },
                                 {role: "user", content: content},
-                            ], chatId, messageId, async () => await updateChatTitle(chat));
+                            ], chatId, messageId, CancelToken.source().token);
+                            await updateChatTitle(chat);
                             close();
                             onPlay();
 

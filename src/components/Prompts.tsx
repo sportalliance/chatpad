@@ -10,6 +10,7 @@ import {DeletePromptModal} from "./DeletePromptModal";
 import {EditPromptModal} from "./EditPromptModal";
 import {updateChatTitle} from "../utils/chatUpdateTitle";
 import {PlayEditPromptModal} from "./PlayEditPromptModal";
+import {CancelToken} from "cancel-token";
 
 export function Prompts({
                             onPlay,
@@ -134,7 +135,7 @@ export function Prompts({
                                             content: prompt.system,
                                         },
                                         {role: "user", content: prompt.content},
-                                    ], chatId, messageId, async () => await updateChatTitle(chat));
+                                    ], chatId, messageId, CancelToken.source().token);
                                 }}
                             >
                                 <IconPlayerPlay size={20}/>
