@@ -43,7 +43,7 @@ export function ChatRoute() {
     const [content, setContent] = useState("");
     const [contentDraft, setContentDraft] = useState("");
     const [submitting, setSubmitting] = useState(false);
-    const [cancellationToken, setCancellationToken] = useState<{
+    const [cancellationSource, setCancellationSource] = useState<{
         token: CancelToken;
         cancel: CancelFunction;
     }>(CancelToken.source());
@@ -83,8 +83,8 @@ export function ChatRoute() {
 
 
     const abortGeneration = () => {
-        cancellationToken.cancel("user cancelled");
-        setCancellationToken(CancelToken.source());
+        cancellationSource.cancel("user cancelled");
+        setCancellationSource(CancelToken.source());
         setSubmitting(false);
         notifications.show({
             title: "Stopped",
@@ -156,7 +156,7 @@ export function ChatRoute() {
             if (chat?.isNewChat || chat?.isNewChat === undefined) {
                 messagesToSend.push({role: "system", content: systemMessage})
             }
-            await createStreamChatCompletion(messagesToSend, chatId, messageId, cancellationToken.token);
+            await createStreamChatCompletion(messagesToSend, chatId, messageId, cancellationSource.token);
             setSubmitting(false);
 
 
