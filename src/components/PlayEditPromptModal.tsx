@@ -84,6 +84,8 @@ export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: 
                             });
 
                             navigate({to: `/chats/${chatId}`});
+                            close();
+                            onPlay();
 
                             await createStreamChatCompletion([
                                 {
@@ -92,9 +94,6 @@ export function PlayEditPromptModal({prompt, onPlay}: { prompt: Prompt, onPlay: 
                                 },
                                 {role: "user", content: content},
                             ], chatId, messageId, CancelToken.source().token);
-                            await updateChatTitle(chat);
-                            close();
-                            onPlay();
 
                         } catch (error: any) {
                             if (error.toJSON().message === "Network Error") {
