@@ -124,6 +124,7 @@ export function ChatRoute() {
                     content: systemMessage,
                     role: "system",
                     createdAt: new Date(),
+                    isGenerating: false,
                 });
             }
 
@@ -133,6 +134,7 @@ export function ChatRoute() {
                 content,
                 role: "user",
                 createdAt: new Date(),
+                isGenerating: false,
             });
             setContent("");
 
@@ -143,6 +145,7 @@ export function ChatRoute() {
                 content: "█",
                 role: "assistant",
                 createdAt: new Date(),
+                isGenerating: true,
             });
 
             let messagesToSend: ChatCompletionMessage[] = [

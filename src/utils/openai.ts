@@ -52,6 +52,7 @@ export async function createStreamChatCompletion(
             }
         }
     } finally {
+        await db.messages.update(messageId, {isGenerating: false});
         if (model != chat?.modelUsed) {
             await db.chats.update(chatId, {modelUsed: model});
         }
@@ -66,7 +67,7 @@ async function setStreamContent(
     isFinal: boolean
 ) {
     content = isFinal ? content : content + "█";
-    await db.messages.update(messageId, {content: content});
+    await db.messages.update(messageId, {content: content, isGenerating: !isFinal});
 }
 
 async function setTotalTokens(chatId: string, content: string) {

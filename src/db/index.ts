@@ -21,6 +21,7 @@ export interface Message {
     role: "system" | "assistant" | "user";
     content: string;
     createdAt: Date;
+    isGenerating: boolean;
 }
 
 export interface Prompt {
@@ -64,6 +65,17 @@ export class Database extends Dexie {
         }).upgrade(trans => {
             return trans.db.table("chats").toCollection().modify(chat => {
                 chat.updatedAt = chat.createdAt;
+            });
+        });
+
+        this.version(7).stores({
+            chats: "id, createdAt, updatedAt",
+            messages: "id, chatId, createdAt, [chatId+role]",
+            prompts: "id, createdAt",
+            settings: "id",
+        }).upgrade(trans => {
+            return trans.db.table("messages").toCollection().modify(message => {
+                message.isGenerating = false;
             });
         });
 

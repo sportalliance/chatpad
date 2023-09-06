@@ -109,6 +109,7 @@ export function Prompts({
                                         content: prompt.system,
                                         role: "system",
                                         createdAt: new Date(),
+                                        isGenerating: false,
                                     });
 
                                     await db.messages.add({
@@ -117,6 +118,7 @@ export function Prompts({
                                         content: prompt.content,
                                         role: "user",
                                         createdAt: new Date(),
+                                        isGenerating: false,
                                     });
                                     let messageId = nanoid();
                                     await db.messages.add({
@@ -125,6 +127,7 @@ export function Prompts({
                                         content: "█",
                                         role: "assistant",
                                         createdAt: new Date(),
+                                        isGenerating: true,
                                     });
 
                                     navigate({to: `/chats/${chatId}`});
