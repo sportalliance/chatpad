@@ -41,6 +41,9 @@ export const MessageItem =  memo(function MessageItem({message}: MessageItemProp
         inline?: boolean
     }, "node" | "className" | "inline" | "lang">) {
         if (className == "language-mermaid") {
+            if(message.isGenerating) {
+                return <Code block {...props} />;
+            }
             return <Mermaid
                 chart={`${props.children as string}`}
             ></Mermaid>
@@ -124,4 +127,4 @@ export const MessageItem =  memo(function MessageItem({message}: MessageItemProp
                     </Flex>
                 </Card>
     );
-}, (prevProps, nextProps) => prevProps.message.content == nextProps.message.content);
+}, (prevProps, nextProps) => prevProps.message.content == nextProps.message.content && prevProps.message.isGenerating == nextProps.message.isGenerating);
