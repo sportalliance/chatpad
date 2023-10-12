@@ -11,8 +11,8 @@
     "staticPath": "src/static"
   },
   "devDependencies": {
-    "@parcel/config-default": "^2.9.3",
-    "@parcel/transformer-sass": "^2.9.3",
+    "@parcel/config-default": "^2.10.0",
+    "@parcel/transformer-sass": "^2.10.0",
     "@types/downloadjs": "^1.4.3",
     "@types/lodash": "^4.14.198",
     "@types/node": "20.6.3",
@@ -22,8 +22,8 @@
     "@types/react-lazyload": "^3.2.0",
     "@types/react-virtualized": "^9.21.22",
     "buffer": "^6.0.3",
-    "parcel": "^2.9.3",
-    "parcel-reporter-static-files-copy": "^1.5.2",
+    "parcel": "^2.10.0",
+    "parcel-reporter-static-files-copy": "^1.5.3",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "property-information": "^6.3.0"
@@ -50,17 +50,17 @@
     "javascript-time-ago": "^2.5.9",
     "lodash": "^4.17.21",
     "mermaid": "^10.4.0",
-    "nanoid": "^4.0.2",
-    "next": "13.5.2",
+    "nanoid": "^5.0.1",
+    "next": "13.5.4",
     "openai": "^4.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-highlight": "^0.15.0",
     "react-icons": "^4.10.1",
-    "react-markdown": "^8.0.7",
+    "react-markdown": ">8.0.0 <9.0.0",
     "react-time-ago": "^7.2.1",
     "react-virtualized": "^9.22.5",
-    "remark-gfm": "^4.0.0",
+    "remark-gfm": ">3.0.0 <4.0.0",
     "typescript": "5.2.2"
   },
   "pnpm": {
