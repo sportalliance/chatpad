@@ -52,7 +52,7 @@
     "mermaid": "^10.4.0",
     "nanoid": "^5.0.1",
     "next": "13.5.4",
-    "openai": "^4.4.0",
+    "openai": "^4.12.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-highlight": "^0.15.0",

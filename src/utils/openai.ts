@@ -1,13 +1,12 @@
 import {ClientOptions, OpenAI} from "openai";
 import {db} from "../db";
 import {config} from "./config";
-import {ChatCompletion, ChatCompletionMessage, Completions} from "openai/resources/chat";
 import {GPTTokens, supportModelType} from "gpt-tokens/index";
 import {useApiKey} from "../hooks/useApiKey";
 import {CancelToken} from "cancel-token";
-import ChatCompletionChunk = Completions.ChatCompletionChunk;
 import {Stream} from "openai/streaming";
 import {updateChatTitle} from "./chatUpdateTitle";
+import {ChatCompletion, ChatCompletionChunk, ChatCompletionMessage} from "openai/resources/chat";
 
 function getClient(
     apiType: string,
