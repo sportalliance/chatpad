@@ -13,34 +13,37 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
-    
+
+env:
+  NODE_IMAGE: 221489699002.dkr.ecr.eu-central-1.amazonaws.com/sportalliance/node:20
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, arm64, default]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Docker login
+        uses: sportalliance/docker-login@main
+        with:
+          role: arn:aws:iam::221489699002:role/github-actions-ecr-reader
+          region: eu-central-1
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
       
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
+      - name: Pull docker image
+        run: docker pull $NODE_IMAGE
+    
       - name: Build
-        run: pnpm run build
+        run: >
+          docker run --rm
+          -v $(pwd):/tmp/build -w /tmp/build
+          -u $(id -u):$(id -g)
+          $NODE_IMAGE
+          /bin/bash -c "pnpm install && pnpm run build"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -48,8 +51,8 @@ jobs:
   publish:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+      url: ${{ steps.build.outputs.page_url }}
+    runs-on: [self-hosted, linux, arm64, default]
     needs: build
     steps:
       - name: Deploy to GitHub Pages
