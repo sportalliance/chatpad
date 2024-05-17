@@ -1,14 +1,9 @@
 name: build-page
+
 on:
   push:
     branches: ["actions"]
-
   workflow_dispatch:
-
-permissions:
-  contents: read
-  packages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -16,8 +11,11 @@ concurrency:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,6 +49,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
