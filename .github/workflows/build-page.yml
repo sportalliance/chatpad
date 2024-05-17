@@ -2,7 +2,7 @@ name: build-page
 
 on:
   push:
-    branches: ["actions"]
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
