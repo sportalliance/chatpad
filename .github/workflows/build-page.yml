@@ -11,10 +11,6 @@ concurrency:
 
 jobs:
   build:
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
     runs-on: ubuntu-latest
     outputs:
       page_url: ${{ steps.upload.outputs.page_url }}
@@ -52,13 +48,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      id-token: write
+      pages: write
     environment:
       name: github-pages
       url: ${{ needs.build.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
-
-
