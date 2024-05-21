@@ -1,7 +1,7 @@
 import { Group, SegmentedControl } from "@mantine/core";
 import React from "react";
 
-export type Model = "gpt-4" | "gpt-4o";
+export type Model = "gpt-4o";
 
 export function ModelChooser(props: {
   value: string,
