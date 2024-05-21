@@ -164,7 +164,7 @@ export function SettingsModal({ children }: { children: ReactElement }) {
             data={[{ "value": "openai", "label": "OpenAI"}, { "value": "custom", "label": "Custom (e.g. Azure OpenAI)"}]}
           />
           <Select
-            label="OpenAI Model (OpenAI Only)"
+            label="OpenAI Model"
             value={model}
             onChange={async (value) => {
               setSubmitting(true);
@@ -203,138 +203,6 @@ export function SettingsModal({ children }: { children: ReactElement }) {
             Keep in mind the cost displayed is a close approximation and may not reflect the actual cost.
             Please use the usage tab to see your actual usage.
           </Alert>
-          <Select
-            label="OpenAI Auth (Custom Only)"
-            value={auth}
-            onChange={async (value) => {
-              setSubmitting(true);
-              try {
-                await db.settings.update("general", {
-                  openAiApiAuth: value ?? 'none',
-                });
-                notifications.show({
-                  title: "Saved",
-                  message: "Your OpenAI Auth has been saved.",
-                });
-              } catch (error: any) {
-                if (error.toJSON().message === "Network Error") {
-                  notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message: "No internet connection.",
-                  });
-                }
-                const message = error.response?.data?.error?.message;
-                if (message) {
-                  notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message,
-                  });
-                }
-              } finally {
-                setSubmitting(false);
-              }
-            }}
-            withinPortal
-            data={[{ "value": "none", "label": "None"}, { "value": "bearer-token", "label": "Bearer Token"}, { "value": "api-key", "label": "API Key"}]}
-          />
-          <form
-            onSubmit={async (event) => {
-              try {
-                setSubmitting(true);
-                event.preventDefault();
-                await db.settings.where({ id: "general" }).modify((row) => {
-                  row.openAiApiBase = base;
-                  console.log(row);
-                });
-                notifications.show({
-                  title: "Saved",
-                  message: "Your OpenAI Base has been saved.",
-                });
-              } catch (error: any) {
-                if (error.toJSON().message === "Network Error") {
-                  notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message: "No internet connection.",
-                  });
-                }
-                const message = error.response?.data?.error?.message;
-                if (message) {
-                  notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message,
-                  });
-                }
-              } finally {
-                setSubmitting(false);
-              }
-            }}
-          >
-            <Flex gap="xs" align="end">
-              <TextInput
-                label="OpenAI API Base (Custom Only)"
-                placeholder="https://<resource-name>.openai.azure.com/openai/deployments/<deployment>"
-                sx={{ flex: 1 }}
-                value={base}
-                onChange={(event) => setBase(event.currentTarget.value)}
-                formNoValidate
-              />
-              <Button type="submit" loading={submitting}>
-                Save
-              </Button>
-            </Flex>
-          </form>
-          <form
-            onSubmit={async (event) => {
-              try {
-                setSubmitting(true);
-                event.preventDefault();
-                await db.settings.where({ id: "general" }).modify((row) => {
-                  row.openAiApiVersion = version;
-                  console.log(row);
-                });
-                notifications.show({
-                  title: "Saved",
-                  message: "Your OpenAI Version has been saved.",
-                });
-              } catch (error: any) {
-                if (error.toJSON().message === "Network Error") {
-                  notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message: "No internet connection.",
-                  });
-                }
-                const message = error.response?.data?.error?.message;
-                if (message) {
-                  notifications.show({
-                    title: "Error",
-                    color: "red",
-                    message,
-                  });
-                }
-              } finally {
-                setSubmitting(false);
-              }
-            }}
-          >
-            <Flex gap="xs" align="end">
-              <TextInput
-                label="OpenAI API Version (Custom Only)"
-                placeholder="2023-03-15-preview"
-                sx={{ flex: 1 }}
-                value={version}
-                onChange={(event) => setVersion(event.currentTarget.value)}
-                formNoValidate
-              />
-              <Button type="submit" loading={submitting}>
-                Save
-              </Button>
-            </Flex>
-          </form>
         </Stack>
       </Modal>
     </>
