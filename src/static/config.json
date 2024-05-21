@@ -13,8 +13,8 @@
   ],
   "writingCharacters": [
     {
-      "label": "Software Designer",
-      "value": "Act as a professional senior software engineer who assists users to solve their coding problems in a technical & CONCISE way. Assume familiarity with programming concepts and JVM languages."
+      "label": "Software Engineer",
+      "value": "Act as a professional senior software engineer who assists users to design, develop and maintains software applications and systems in a technical & CONCISE way. Assume familiarity with programming concepts and JVM languages."
     },
     {
       "label": "Software Designer",
