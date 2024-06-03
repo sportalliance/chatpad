@@ -190,7 +190,7 @@ func share1PasswordItem(name Name) {
 		log.Fatal(err)
 	}
 
-	log.Println("1Password Share Link:", string(out))
+	log.Println("1Password Share Link:\n", string(out))
 }
 
 func modifyAPIKey(bearerToken string, modifiedName Name, serviceAcc ServiceAccount) {
@@ -216,4 +216,3 @@ func modifyAPIKey(bearerToken string, modifiedName Name, serviceAcc ServiceAccou
 		log.Fatal(err, string(body))
 	}
 }
-

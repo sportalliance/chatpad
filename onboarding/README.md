@@ -9,7 +9,6 @@ This script automates the process of generating, modifying, and storing an API k
     - [Integrate 1Password CLI with 1Password app](https://developer.1password.com/docs/cli/app-integration/)
 1. **Go**: Ensure you have Go installed on your machine.
     - [Install Go](https://golang.org/doc/install) e.g. `brew install go`
-    - Alternatively use a docker image
 
 
 ## Usage
@@ -25,14 +24,9 @@ The script is witten in
    ```bash
    go run main.go --token sses-*** --email some.email@sportalliance.com
    ```
-   or using docker
+   or use make
    ```bash
-   docker run \
-     -it \
-     --rm \
-     -v "$PWD":/tmp/onboarding \
-     -w /tmp/onboarding \
-     golang:1.23 run main.go --token sses-*** --email some.email@sportalliance.com
+   make TOKEN=sses-*** EMAIL=sme.email@sportalliance.com
    ```
 
 ## Hardcoded Project ID
