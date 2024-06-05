@@ -7,33 +7,26 @@ This script automates the process of generating, modifying, and storing an API k
 1. **1Password CLI**: Ensure you have the `op` CLI installed and integrated with the 1Password app.
     - [Install 1Password CLI](https://developer.1password.com/docs/cli/get-started/)
     - [Integrate 1Password CLI with 1Password app](https://developer.1password.com/docs/cli/app-integration/)
+1. **Go**: Ensure you have Go installed on your machine.
+    - [Install Go](https://golang.org/doc/install) e.g. `brew install go`
 
-2. **jq**: A lightweight and flexible command-line JSON processor.
-    - Install `jq`: `brew install jq` (macOS) or download from
-      the [official website](https://stedolan.github.io/jq/download/).
-
-3. **cURL**: A command-line tool for transferring data with URLs.
-    - Install `cURL`: `brew install curl` (macOS) or download from
-      the [official website](https://curl.se/download.html).
 
 ## Usage
 
+The script is witten in
+
 ### Script Execution
 
-1. **Download the Script**:
-   Save the script below to a file named `manage_api_key.sh`.
+1. **Checkout the repository**:
 
-2. **Make the Script Executable**:
+1. **Run the Script**:
+   Make sure to use a session token taken from the browser.
    ```bash
-   chmod +x manage_api_key.sh
+   go run main.go --token sses-*** --email some.email@sportalliance.com
    ```
-
-3. **Run the Script**:
+   or use make
    ```bash
-   ./manage_api_key.sh <apikey_name> <bearer_token>
-4. **Example**:
-   ```bash
-   ./manage_api_key.sh chatpad-lorenz-schumann your_bearer_token
+   make TOKEN=sses-*** EMAIL=sme.email@sportalliance.com
    ```
 
 ## Hardcoded Project ID
