@@ -8,7 +8,11 @@
   "availableModels": [
     {
       "value": "gpt-4o",
-      "label": "GPT-4o (Omni)"
+      "label": "GPT-4o"
+    },
+    {
+      "value": "o1-mini",
+      "label": "o1-mini"
     }
   ],
   "writingCharacters": [
