@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -18,6 +19,8 @@ const (
 )
 
 type ServiceAccount struct {
+	Id     string `json:"id"`
+	Object string `json:"object"`
 	Secret []struct {
 		SensitiveID string `json:"sensitive_id"`
 		CreatedAt   int    `json:"created"`
@@ -50,9 +53,12 @@ type Name struct {
 }
 
 func NewName(email string) Name {
+	if strings.Contains(email, "@sportalliance.com") {
+		log.Fatalln("The email address should be a Sport Alliance email address", email)
+	}
 	segments, ok := strings.CutSuffix(email, "@sportalliance.com")
 	if !ok {
-		log.Fatalln("The email address should be a valid Sport Alliance email address")
+		log.Fatalln("The email address should be a valid Sport Alliance email address", segments)
 	}
 
 	nameSegments := strings.Split(segments, ".")
@@ -95,12 +101,12 @@ func main() {
 	addTo1Password(name, serviceAcc)
 	log.Println("API key added to 1Password successfully.")
 
+	log.Println("Sharing 1Password item...")
+	share1PasswordItem(name)
+
 	log.Println("Modifying API key...")
 	modifyAPIKey(*bearerToken, name, serviceAcc)
 	log.Println("API key modified successfully.")
-
-	log.Println("Sharing 1Password item...")
-	share1PasswordItem(name)
 }
 
 func checkCommand(cmdName, errMsg string) {
@@ -113,7 +119,7 @@ func signInTo1Password() {
 	cmd := exec.Command("op", "signin", "--raw")
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 }
 
@@ -121,41 +127,47 @@ func createOpenAiServiceAccount(name Name, bearerToken string) ServiceAccount {
 	var response ServiceAccount
 	reqBody := fmt.Sprintf(`{"id":"%s"}`, name.ServiceAccountName)
 	req, _ := http.NewRequest("POST", "https://api.openai.com/v1/dashboard/service_accounts", bytes.NewBuffer([]byte(reqBody)))
-	setHeaders(req, bearerToken)
+	setHeaders(req, bearerToken, len(reqBody))
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("Error creating OpenAI service account", err)
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		log.Fatal(err)
+		body, _ := io.ReadAll(resp.Body)
+		log.Fatalln("Error decoding service account creation response:", err, "\nBody:", string(body))
 	}
 
+	log.Printf("Created %+v\n", response)
+	if len(response.Secret) == 0 {
+		log.Fatalln("Error creating OpenAI service account: no key was created")
+	}
 	return response
 }
 
-func setHeaders(req *http.Request, bearerToken string) {
+func setHeaders(req *http.Request, bearerToken string, contentLength int) {
 	headers := map[string]string{
-		"authorization":       "Bearer " + bearerToken,
-		"accept":              "*/*",
-		"content-type":        "application/json",
-		"accept-language":     "en-GB,en-US;q=0.9,en;q=0.8",
-		"cache-control":       "no-cache",
-		"origin":              "https://platform.openai.com",
-		"pragma":              "no-cache",
-		"priority":            "u=1, i",
-		"referer":             "https://platform.openai.com/",
-		"sec-ch-ua":           "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
-		"sec-ch-ua-mobile":    "?0",
-		"sec-ch-ua-platform":  "\"macOS\"",
-		"sec-fetch-dest":      "empty",
-		"sec-fetch-mode":      "cors",
-		"sec-fetch-site":      "same-site",
-		"user-agent":          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-		"openai-organization": ORG_ID,
-		"openai-project":      PROJECT_ID,
+		"Authorization":       "Bearer " + bearerToken,
+		"Accept":              "*/*",
+		"Content-Type":        "application/json",
+		"OpenAI-Organization": ORG_ID,
+		"OpenAI-Project":      PROJECT_ID,
+		"Host":                "api.openai.com",
+		"User-Agent":          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
+		"Accept-Language":     "en-US,en;q=0.7,de-DE;q=0.3",
+		"Referer":             "https://platform.openai.com/",
+		"Content-Length":      strconv.Itoa(contentLength),
+		"Origin":              "https://platform.openai.com",
+		"Connection":          "keep-alive",
+		"Sec-Fetch-Dest":      "empty",
+		"Sec-Fetch-Mode":      "cors",
+		"Sec-Fetch-Site":      "same-site",
+		"Priority":            "u=0",
+		"Pragma":              "no-cache",
+		"Cache-Control":       "no-cache",
+		"TE":                  "trailers",
 	}
 	for key, value := range headers {
 		req.Header.Set(key, value)
@@ -175,7 +187,7 @@ func addTo1Password(name Name, serviceAcc ServiceAccount) {
 		"password="+token)
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("Failed adding key to 1PW", err)
 	}
 }
 
@@ -187,7 +199,7 @@ func share1PasswordItem(name Name) {
 	)
 	out, err := cmd.Output()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("Error sharing 1PW link", err)
 	}
 
 	log.Println("1Password Share Link:\n", string(out))
@@ -204,15 +216,15 @@ func modifyAPIKey(bearerToken string, modifiedName Name, serviceAcc ServiceAccou
 		modifiedName.KeyName,
 	)
 	req, _ := http.NewRequest("POST", "https://api.openai.com/dashboard/organizations/"+ORG_ID+"/projects/"+PROJECT_ID+"/api_keys", bytes.NewBuffer([]byte(reqBody)))
-	setHeaders(req, bearerToken)
+	setHeaders(req, bearerToken, len(reqBody))
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("Failed to modify the OpenAI API key", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(resp.Body)
-		log.Fatal(err, string(body))
+		body, _ := io.ReadAll(resp.Body)
+		log.Fatalln("Failed to modify the OpenAI API key", err, string(body))
 	}
 }
